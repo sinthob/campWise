@@ -1,0 +1,266 @@
+{
+  "Gear_Lists": [
+    {
+      "id": "rec_mock_gear_001",
+      "createdTime": "2026-02-20T00:00:00.000Z",
+      "fields": {
+        "Set Name": "ชุดเริ่มต้น: ตั้งแคมป์สบายๆ",
+        "AI Gear Tip": "เริ่มด้วยของจำเป็นก่อน: เต็นท์, ไฟฉายคาดหัว, power bank และชุดปฐมพยาบาล แล้วค่อยเพิ่มอุปกรณ์ตามสภาพอากาศและระยะทริป",
+        "Gear Image": [
+          {
+            "url": "/globe.svg",
+            "filename": "gear.svg"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rec_mock_gear_002",
+      "createdTime": "2026-02-20T00:00:00.000Z",
+      "fields": {
+        "Set Name": "ชุดสายฝน",
+        "AI Gear Tip": "พกเสื้อกันฝน + ผ้าคลุมเป้ + ถุงกันน้ำแยกของอิเล็กทรอนิกส์ และเตรียมผ้าไมโครไฟเบอร์ไว้เช็ดอุปกรณ์",
+        "Gear Image": [
+          {
+            "url": "/window.svg",
+            "filename": "rain.svg"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rec_mock_gear_003",
+      "createdTime": "2026-02-20T00:00:00.000Z",
+      "fields": {
+        "Set Name": "ชุดทำอาหารแคมป์",
+        "AI Gear Tip": "เลือกเตา/เชื้อเพลิงที่หาเติมได้ง่ายในพื้นที่ และพกที่จุดไฟสำรอง 2 แบบ (ไฟแช็ก+แท่งจุดไฟ)",
+        "Gear Image": [
+          {
+            "url": "/file.svg",
+            "filename": "cook.svg"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rec_mock_gear_004",
+      "createdTime": "2026-02-20T00:00:00.000Z",
+      "fields": {
+        "Set Name": "ชุดเดินป่าระยะสั้น",
+        "AI Gear Tip": "น้ำ 1–2 ลิตร/คน, อาหารพลังงานสูง, แผนที่ออฟไลน์ และแจ้งเส้นทางให้เพื่อนรู้ก่อนออกเดิน",
+        "Gear Image": [
+          {
+            "url": "/globe.svg",
+            "filename": "hike.svg"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rec_mock_gear_005",
+      "createdTime": "2026-02-20T00:00:00.000Z",
+      "fields": {
+        "Set Name": "ชุดนอนอุ่น",
+        "AI Gear Tip": "ถ้าอากาศเย็น ให้เน้น insulating layer: แผ่นรองนอนค่า R สูง + ถุงนอนอุณหภูมิถึง และใส่หมวก/ถุงเท้านอน",
+        "Gear Image": [
+          {
+            "url": "/next.svg",
+            "filename": "sleep.svg"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rec_mock_gear_006",
+      "createdTime": "2026-02-20T00:00:00.000Z",
+      "fields": {
+        "Set Name": "ชุดคาเฟ่แคมป์",
+        "AI Gear Tip": "ถ้าชอบกาแฟ ให้คุมคุณภาพด้วย grinder มือ + dripper แบบพกพา และพกขวดน้ำร้อนเก็บความร้อน",
+        "Gear Image": [
+          {
+            "url": "/vercel.svg",
+            "filename": "coffee.svg"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rec_mock_gear_007",
+      "createdTime": "2026-02-20T00:00:00.000Z",
+      "fields": {
+        "Set Name": "ชุดครอบครัว",
+        "AI Gear Tip": "เตรียมไฟส่องสว่างหลายจุด (โคมไฟ/ไฟฉาย), ชุดกันยุง, และกิจกรรมเด็ก เช่น ไพ่/เกมเล็กๆ",
+        "Gear Image": [
+          {
+            "url": "/window.svg",
+            "filename": "family.svg"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rec_mock_gear_008",
+      "createdTime": "2026-02-20T00:00:00.000Z",
+      "fields": {
+        "Set Name": "ชุดสายมินิมอล",
+        "AI Gear Tip": "ลดน้ำหนักด้วยอุปกรณ์อเนกประสงค์ (หม้อใบเดียว, ช้อนส้อม spork) และบรรจุภัณฑ์ซิปล็อกแยกหมวด",
+        "Gear Image": [
+          {
+            "url": "/file.svg",
+            "filename": "minimal.svg"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rec_mock_gear_009",
+      "createdTime": "2026-02-20T00:00:00.000Z",
+      "fields": {
+        "Set Name": "ชุดความปลอดภัย",
+        "AI Gear Tip": "พก whistle, ไฟฉายสำรอง, power bank, และบันทึกพิกัดจุดจอดรถ/แคมป์ในแผนที่ออฟไลน์",
+        "Gear Image": [
+          {
+            "url": "/globe.svg",
+            "filename": "safety.svg"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rec_mock_gear_010",
+      "createdTime": "2026-02-20T00:00:00.000Z",
+      "fields": {
+        "Set Name": "ชุดลมแรง",
+        "AI Gear Tip": "เพิ่มสมอบก/เชือก, ตรวจทิศลมก่อนกางเต็นท์ และกางให้ด้านท้ายรับลมเพื่อลดแรงปะทะ",
+        "Gear Image": [
+          {
+            "url": "/window.svg",
+            "filename": "wind.svg"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rec_mock_gear_011",
+      "createdTime": "2026-02-20T00:00:00.000Z",
+      "fields": {
+        "Set Name": "ชุดถ่ายรูป",
+        "AI Gear Tip": "ถ้าถ่ายดาว/กลางคืน พกขาตั้ง + รีโมท/ตั้งเวลา และสำรองแบตเพราะอากาศเย็นทำให้แบตหมดไว",
+        "Gear Image": [
+          {
+            "url": "/next.svg",
+            "filename": "photo.svg"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rec_mock_gear_012",
+      "createdTime": "2026-02-20T00:00:00.000Z",
+      "fields": {
+        "Set Name": "ชุดกันยุง",
+        "AI Gear Tip": "ใช้ยากันยุงที่เหมาะกับพื้นที่ + มุ้ง/ตาข่าย และพิจารณาเสื้อแขนยาวบางๆ เพื่อลดการทาเคมี",
+        "Gear Image": [
+          {
+            "url": "/vercel.svg",
+            "filename": "mosquito.svg"
+          }
+        ]
+      }
+    }
+  ],
+  "Campgrounds": [
+    {
+      "id": "rec_mock_camp_001",
+      "createdTime": "2026-02-20T00:00:00.000Z",
+      "fields": {
+        "Name Campground": "Pine Ridge Retreat",
+        "Province": "Chiang Mai",
+        "Type": "Mountain",
+        "Pet Friendly": true,
+        "WiFi": false
+      }
+    },
+    {
+      "id": "rec_mock_camp_002",
+      "createdTime": "2026-02-20T00:00:00.000Z",
+      "fields": {
+        "Name Campground": "Crystal Lake Shores",
+        "Province": "Kanchanaburi",
+        "Type": "Lake",
+        "Pet Friendly": false,
+        "WiFi": true
+      }
+    },
+    {
+      "id": "rec_mock_camp_003",
+      "createdTime": "2026-02-20T00:00:00.000Z",
+      "fields": {
+        "Name Campground": "Evergreen Valley",
+        "Province": "Nan",
+        "Type": "Forest",
+        "Pet Friendly": true,
+        "WiFi": false
+      }
+    },
+    {
+      "id": "rec_mock_camp_004",
+      "createdTime": "2026-02-20T00:00:00.000Z",
+      "fields": {
+        "Name Campground": "Sunset Peak",
+        "Province": "Phetchabun",
+        "Type": "High Altitude",
+        "Pet Friendly": true,
+        "WiFi": false
+      }
+    },
+    {
+      "id": "rec_mock_camp_005",
+      "createdTime": "2026-02-20T00:00:00.000Z",
+      "fields": {
+        "Name Campground": "Mist Falls Lodge",
+        "Province": "Tak",
+        "Type": "Waterfall",
+        "Pet Friendly": false,
+        "WiFi": false
+      }
+    },
+    {
+      "id": "rec_mock_camp_006",
+      "createdTime": "2026-02-20T00:00:00.000Z",
+      "fields": {
+        "Name Campground": "Whispering Pines RV",
+        "Province": "Chonburi",
+        "Type": "RV",
+        "Pet Friendly": true,
+        "WiFi": true
+      }
+    }
+  ],
+  "Camping_Hacks": [
+    {
+      "id": "rec_mock_hack_001",
+      "createdTime": "2026-02-20T00:00:00.000Z",
+      "fields": {
+        "Topic name": "กันของเปียกแบบง่าย",
+        "Content": "แยกของด้วยถุงซิปล็อก/ถุงกันน้ำเป็นหมวด: เสื้อผ้า, อุปกรณ์ไฟฟ้า, อาหาร และพกถุงขยะหนา 1-2 ใบเป็นตัวสำรอง"
+      }
+    },
+    {
+      "id": "rec_mock_hack_002",
+      "createdTime": "2026-02-20T00:00:00.000Z",
+      "fields": {
+        "Topic name": "ไฟส่องสว่างหลายระดับ",
+        "Content": "ใช้โคมไฟเป็นไฟหลัก และไฟฉายคาดหัวเป็นไฟทำงาน จะช่วยประหยัดแบตและทำกิจกรรมกลางคืนสะดวกขึ้น"
+      }
+    },
+    {
+      "id": "rec_mock_hack_003",
+      "createdTime": "2026-02-20T00:00:00.000Z",
+      "fields": {
+        "Topic name": "ทำความสะอาดเร็ว",
+        "Content": "พกผ้าไมโครไฟเบอร์ + สบู่ล้างจานขวดเล็ก และใช้ขวดสเปรย์น้ำช่วยล้างคราบ จะลดการใช้น้ำและเก็บของง่าย"
+      }
+    }
+  ]
+}
