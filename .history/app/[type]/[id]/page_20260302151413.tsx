@@ -517,10 +517,27 @@ export default async function DynamicDetailPage(props: {
   const fallbackAiSummary = pickString(record.fields, cfg.aiSummaryKeys);
   const rawReview = pickString(record.fields, cfg.rawReviewKeys);
 
+  const aiSummaryForCard =
+    type === "campground"
+      ? pickString(record.fields, [
+          "AI Summary",
+          "AI Summary (EN)",
+          "AI Insight",
+          "Summary",
+          "Description",
+        ])
+      : "";
+
   const aiSummaryTrimmed = fallbackAiSummary?.trim();
   const aiSummaryLooksJson =
     !!aiSummaryTrimmed &&
     (aiSummaryTrimmed.startsWith("{") || aiSummaryTrimmed.startsWith("["));
+
+  const aiSummaryForCardTrimmed = aiSummaryForCard?.trim();
+  const aiSummaryForCardLooksJson =
+    !!aiSummaryForCardTrimmed &&
+    (aiSummaryForCardTrimmed.startsWith("{") ||
+      aiSummaryForCardTrimmed.startsWith("["));
 
   const parsedInsight = parseAiInsightJson(fallbackAiSummary);
   const strengthsList = parsedInsight?.strengths?.length
@@ -545,6 +562,17 @@ export default async function DynamicDetailPage(props: {
     tipsList.length > 0;
 
   const quickFacts = getQuickFacts(record.fields, cfg.quickFactsExclude);
+
+  const roadmapOneDay =
+    type === "campground"
+      ? toMultilineStringFromUnknown(record.fields["Roadmap Guide one day"])
+      : "";
+  const roadmapTwoDay =
+    type === "campground"
+      ? toMultilineStringFromUnknown(record.fields["Roadmap Guide two day"])
+      : "";
+
+  const hasAnyRoadmap = !!(roadmapOneDay || roadmapTwoDay);
 
   return (
     <div className="min-h-screen bg-background px-4 py-10 text-foreground">
@@ -586,7 +614,17 @@ export default async function DynamicDetailPage(props: {
           ) : null}
         </header>
 
-        {/* 2) AI Insight */}
+        {/* 2) AI Summary (campground only) */}
+        {type === "campground" && aiSummaryForCard && !aiSummaryForCardLooksJson ? (
+          <section className="rounded-2xl border border-moss/30 bg-moss/10 p-6">
+            <h2 className="text-base font-semibold">🤖 AI Summary</h2>
+            <p className="mt-2 whitespace-pre-line text-sm leading-7 text-foreground/80">
+              {aiSummaryForCard}
+            </p>
+          </section>
+        ) : null}
+
+        {/* 3) AI Insight */}
         {hasAnyInsight ? (
           <section className="rounded-2xl border border-moss/30 bg-moss/10 p-6">
             <h2 className="text-base font-semibold">🤖 AI Insight</h2>
@@ -639,7 +677,7 @@ export default async function DynamicDetailPage(props: {
           </section>
         ) : null}
 
-        {/* 3) Quick Facts */}
+        {/* 4) Quick Facts */}
         {quickFacts.length > 0 ? (
           <section className="rounded-2xl border border-moss/30 bg-forest p-6 text-sand">
             <h2 className="text-base font-semibold">Quick Facts</h2>
@@ -661,7 +699,37 @@ export default async function DynamicDetailPage(props: {
           </section>
         ) : null}
 
-        {/* 4) Raw review (collapsible) */}
+        {/* 5) Trip planning (campground only) */}
+        {type === "campground" && hasAnyRoadmap ? (
+          <section className="rounded-2xl border border-moss/30 bg-forest p-6 text-sand">
+            <h2 className="text-base font-semibold">แนะนำการวางแผนทริป</h2>
+            <p className="mt-1 text-sm text-sand/70">
+              แผนตัวอย่างสำหรับทริปสั้นและทริปวันหยุดยาว (ดึงจาก Airtable)
+            </p>
+
+            <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div className="rounded-xl bg-forest/60 p-5 ring-1 ring-moss/30">
+                <h3 className="text-sm font-semibold">
+                  1 วัน 1 คืน (แนะนำสำหรับสุดสัปดาห์)
+                </h3>
+                <p className="mt-3 whitespace-pre-line text-sm leading-7 text-sand/80">
+                  {roadmapOneDay || "ยังไม่มีข้อมูลใน Airtable"}
+                </p>
+              </div>
+
+              <div className="rounded-xl bg-forest/60 p-5 ring-1 ring-moss/30">
+                <h3 className="text-sm font-semibold">
+                  2 วัน 2 คืน (แนะนำสำหรับวันหยุดยาว)
+                </h3>
+                <p className="mt-3 whitespace-pre-line text-sm leading-7 text-sand/80">
+                  {roadmapTwoDay || "ยังไม่มีข้อมูลใน Airtable"}
+                </p>
+              </div>
+            </div>
+          </section>
+        ) : null}
+
+        {/* 6) Raw review (collapsible) */}
         {rawReview ? (
           <section className="rounded-2xl border border-moss/30 bg-forest p-6 text-sand">
             <details className="group">
