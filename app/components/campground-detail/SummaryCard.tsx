@@ -1,8 +1,12 @@
+import type { ReactNode } from "react";
+
 export default function SummaryCard(props: {
   badgeLabel: string;
   title: string;
   location?: string;
   aiSummary?: string;
+  quickInfo?: ReactNode;
+  actions?: ReactNode;
 }) {
   return (
     <section
@@ -20,6 +24,10 @@ export default function SummaryCard(props: {
       {props.location ? (
         <p className="mt-2 text-sm text-sand/70">{props.location}</p>
       ) : null}
+
+      {props.quickInfo ? <div className="mt-1">{props.quickInfo}</div> : null}
+
+      {props.actions ? <div className="mt-5">{props.actions}</div> : null}
 
       {props.aiSummary ? (
         <div className="mt-6">

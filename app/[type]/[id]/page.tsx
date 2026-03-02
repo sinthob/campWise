@@ -4,8 +4,12 @@ import { fetchAirtableRecordById, getFirstAttachmentUrl } from "@/lib/airtable";
 
 import HeroGallery from "@/app/components/campground-detail/HeroGallery";
 import SummaryCard from "@/app/components/campground-detail/SummaryCard";
-import EssentialsRow from "@/app/components/campground-detail/EssentialsRow";
-import TripCard from "@/app/components/campground-detail/TripCard";
+import QuickInfoBar from "@/app/components/campground-detail/QuickInfoBar";
+import HeroActions from "@/app/components/campground-detail/HeroActions";
+import MapPreview from "@/app/components/campground-detail/MapPreview";
+import TripTimeline from "@/app/components/campground-detail/TripTimeline";
+import BestSeason from "@/app/components/campground-detail/BestSeason";
+import GearSuggestion from "@/app/components/campground-detail/GearSuggestion";
 import MobileStickyCTA from "@/app/components/campground-detail/MobileStickyCTA";
 
 export const dynamic = "force-dynamic";
@@ -304,6 +308,88 @@ function toMultilineStringFromUnknown(value: unknown): string {
   return "";
 }
 
+function toShortStringFromUnknown(value: unknown): string {
+  if (value === null || value === undefined) return "";
+
+  if (typeof value === "string") return value.trim();
+  if (typeof value === "number") return String(value);
+  if (typeof value === "boolean") return value ? "Yes" : "No";
+
+  if (Array.isArray(value)) {
+    const parts = value
+      .flatMap((v) =>
+        typeof v === "string"
+          ? [v.trim()]
+          : typeof v === "number"
+            ? [String(v)]
+            : typeof v === "boolean"
+              ? [v ? "Yes" : "No"]
+              : [],
+      )
+      .filter(Boolean);
+    return parts.join(", ");
+  }
+
+  return "";
+}
+
+function toGoogleMapsUrls(params: {
+  title: string;
+  location?: string;
+  fields: Record<string, unknown>;
+}): { mapsUrl: string; embedUrl: string } {
+  const directUrlCandidates = [
+    "Google Maps",
+    "Google Maps URL",
+    "Map",
+    "Map Link",
+    "Location URL",
+  ];
+
+  for (const k of directUrlCandidates) {
+    const v = params.fields[k];
+    if (typeof v === "string" && v.includes("google.com/maps")) {
+      return {
+        mapsUrl: v,
+        embedUrl: v.includes("output=embed")
+          ? v
+          : `https://www.google.com/maps?q=${encodeURIComponent(v)}&output=embed`,
+      };
+    }
+  }
+
+  const lat = params.fields["Lat"] ?? params.fields["Latitude"];
+  const lng = params.fields["Lng"] ?? params.fields["Longitude"];
+  const hasLatLng =
+    (typeof lat === "number" || typeof lat === "string") &&
+    (typeof lng === "number" || typeof lng === "string");
+
+  const query = hasLatLng
+    ? `${String(lat).trim()},${String(lng).trim()}`
+    : [params.title, params.location].filter(Boolean).join(" ");
+
+  const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+    query,
+  )}`;
+  const embedUrl = `https://www.google.com/maps?q=${encodeURIComponent(
+    query,
+  )}&output=embed`;
+
+  return { mapsUrl, embedUrl };
+}
+
+function parseMonthBadges(raw: string): string[] {
+  const normalized = raw.replace(/\r/g, "").trim();
+  if (!normalized) return [];
+
+  const parts = normalized
+    .split(/\n|,|\/|\u2022|•/g)
+    .map((p) => p.trim())
+    .filter(Boolean);
+
+  return parts.slice(0, 12);
+}
+
 function parseAiInsightJson(raw: string | undefined | null): {
   strengths: string[];
   weaknesses: string[];
@@ -418,8 +504,106 @@ export default async function DynamicDetailPage(props: {
       record.fields["Roadmap Guide two day"],
     );
 
-    const essentialsType = pickString(record.fields, ["Type"]) || "";
-    const essentialsProvince = pickString(record.fields, ["Province", "State"]);
+    const { mapsUrl, embedUrl } = toGoogleMapsUrls({
+      title,
+      location,
+      fields: record.fields,
+    });
+
+    const quickInfoItems = [
+      location
+        ? { icon: "📍", label: "Location", value: location }
+        : null,
+      {
+        icon: "🚗",
+        label: "Travel time",
+        value:
+          pickString(record.fields, [
+            "Travel time from Bangkok",
+            "Travel Time from Bangkok",
+            "Travel time",
+            "Travel Time",
+            "Bangkok Travel Time",
+          ]) ||
+          toShortStringFromUnknown(record.fields["Travel time from Bangkok"]),
+      },
+      {
+        icon: "🌡",
+        label: "Night temp",
+        value:
+          pickString(record.fields, [
+            "Night temperature range",
+            "Night Temp",
+            "Night Temperature",
+            "Temperature",
+            "Temp Range",
+          ]) || toShortStringFromUnknown(record.fields["Night temperature range"]),
+      },
+      {
+        icon: "⛺",
+        label: "Camping",
+        value: toShortStringFromUnknown(
+          record.fields["Camping allowed"] ?? record.fields["Camping Allowed"],
+        ),
+      },
+      {
+        icon: "🚻",
+        label: "Toilet",
+        value: toShortStringFromUnknown(
+          record.fields["Toilet availability"] ?? record.fields["Toilet"],
+        ),
+      },
+      {
+        icon: "⚡",
+        label: "Electricity",
+        value: toShortStringFromUnknown(record.fields["Electricity"]),
+      },
+      {
+        icon: "📶",
+        label: "Signal",
+        value: toShortStringFromUnknown(
+          record.fields["Signal strength"] ?? record.fields["Signal"],
+        ),
+      },
+      {
+        icon: "⭐",
+        label: "Difficulty",
+        value: toShortStringFromUnknown(
+          record.fields["Difficulty level"] ?? record.fields["Difficulty"],
+        ),
+      },
+    ].filter((i) => i && i.value && i.value.trim().length > 0) as Array<{
+      icon: string;
+      label: string;
+      value: string;
+    }>;
+
+    const bestSeasonMonthsRaw = pickString(record.fields, [
+      "Best Season",
+      "Best Months",
+      "Best time to visit",
+      "Best Time",
+    ]);
+    const bestSeasonMonths = bestSeasonMonthsRaw
+      ? parseMonthBadges(bestSeasonMonthsRaw)
+      : [];
+
+    const bestSeasonRatingRaw =
+      record.fields["Best Season Rating"] ?? record.fields["Season Rating"];
+    const bestSeasonRating =
+      typeof bestSeasonRatingRaw === "number"
+        ? bestSeasonRatingRaw
+        : typeof bestSeasonRatingRaw === "string"
+          ? Number(bestSeasonRatingRaw)
+          : undefined;
+
+    const gearSuggestionRaw =
+      record.fields["Gear Suggestion"] ??
+      record.fields["What to bring"] ??
+      record.fields["What to bring / Tips"] ??
+      record.fields["Recommended Gear"] ??
+      record.fields["Packing List"];
+    const gearItems = toStringListFromUnknown(gearSuggestionRaw);
 
     return (
       <div className="min-h-screen bg-forest px-4 py-8 text-sand">
@@ -444,33 +628,15 @@ export default async function DynamicDetailPage(props: {
                 title={title}
                 location={location}
                 aiSummary={aiSummaryLooksJson ? undefined : aiSummaryText}
+                quickInfo={<QuickInfoBar items={quickInfoItems} />}
+                actions={
+                  <HeroActions recordId={id} title={title} mapsUrl={mapsUrl} />
+                }
               />
-
-              <div className="mt-4 lg:hidden">
-                <EssentialsRow
-                  items={[
-                    location
-                      ? { label: "Location", value: location, icon: "📍" }
-                      : null,
-                    essentialsType
-                      ? { label: "Type", value: essentialsType, icon: "🏷" }
-                      : null,
-                    essentialsProvince
-                      ? {
-                          label: "Area",
-                          value: essentialsProvince,
-                          icon: "🗺" ,
-                        }
-                      : null,
-                  ].filter(Boolean) as Array<{
-                    label: string;
-                    value: string;
-                    icon?: string;
-                  }>}
-                />
-              </div>
             </div>
           </div>
+
+          <MapPreview title={title} embedUrl={embedUrl} mapsUrl={mapsUrl} />
 
           <section aria-label="Trip plans" className="space-y-4">
             <header className="space-y-1">
@@ -483,28 +649,27 @@ export default async function DynamicDetailPage(props: {
             </header>
 
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-              <TripCard
-                recordId={id}
-                planKey="one-day"
+              <TripTimeline
                 title="1 Day 1 Night"
                 intro="Recommended for weekends — a compact plan that still feels complete."
                 planText={roadmapOneDay}
-                collapsibleOnMobile
               />
 
-              <TripCard
-                recordId={id}
-                planKey="two-day"
+              <TripTimeline
                 title="2 Days 2 Nights"
                 intro="Recommended for longer breaks — slower pace, more activities."
                 planText={roadmapTwoDay}
-                collapsibleOnMobile
               />
             </div>
           </section>
+
+          <section aria-label="Season and gear" className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <BestSeason months={bestSeasonMonths} rating={bestSeasonRating} />
+            <GearSuggestion recordId={id} items={gearItems} />
+          </section>
         </div>
 
-        <MobileStickyCTA recordId={id} title={title} />
+        <MobileStickyCTA recordId={id} title={title} mapsUrl={mapsUrl} />
       </div>
     );
   }

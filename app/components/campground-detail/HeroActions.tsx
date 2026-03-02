@@ -1,0 +1,86 @@
+"use client";
+
+import { useEffect, useState } from "react";
+
+function safeLocalStorageGet(key: string): string | null {
+  try {
+    return window.localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function safeLocalStorageSet(key: string, value: string) {
+  try {
+    window.localStorage.setItem(key, value);
+  } catch {
+    // ignore
+  }
+}
+
+export default function HeroActions(props: {
+  recordId: string;
+  title: string;
+  mapsUrl: string;
+}) {
+  const saveKey = `campwise:saved:${props.recordId}:campground`;
+  const [saved, setSaved] = useState(false);
+  const [shared, setShared] = useState(false);
+
+  useEffect(() => {
+    setSaved(safeLocalStorageGet(saveKey) === "1");
+  }, [saveKey]);
+
+  function toggleSave() {
+    const next = !saved;
+    setSaved(next);
+    safeLocalStorageSet(saveKey, next ? "1" : "0");
+  }
+
+  async function share() {
+    const url = window.location.href;
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: props.title, url });
+      } else {
+        await navigator.clipboard.writeText(url);
+      }
+      setShared(true);
+      window.setTimeout(() => setShared(false), 1200);
+    } catch {
+      // ignore
+    }
+  }
+
+  return (
+    <section aria-label="Actions" className="mt-5">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <button
+          type="button"
+          onClick={toggleSave}
+          aria-pressed={saved}
+          className="inline-flex h-12 w-full items-center justify-center rounded-full bg-accent px-5 text-sm font-semibold text-forest hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
+          {saved ? "🔖 Saved" : "🔖 Save Place"}
+        </button>
+
+        <a
+          href={props.mapsUrl}
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex h-12 w-full items-center justify-center rounded-full bg-forest px-5 text-sm font-semibold text-sand ring-1 ring-moss/30 hover:bg-forest/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
+          🗺 Open in Google Maps
+        </a>
+
+        <button
+          type="button"
+          onClick={share}
+          className="inline-flex h-12 w-full items-center justify-center rounded-full bg-forest px-5 text-sm font-semibold text-sand ring-1 ring-moss/30 hover:bg-forest/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent sm:col-span-2"
+        >
+          {shared ? "📤 Shared" : "📤 Share"}
+        </button>
+      </div>
+    </section>
+  );
+}

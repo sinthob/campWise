@@ -21,6 +21,7 @@ function safeLocalStorageSet(key: string, value: string) {
 export default function MobileStickyCTA(props: {
   recordId: string;
   title: string;
+  mapsUrl: string;
 }) {
   const storageKey = `campwise:saved:${props.recordId}:campground`;
   const [saved, setSaved] = useState(false);
@@ -64,15 +65,24 @@ export default function MobileStickyCTA(props: {
           type="button"
           onClick={toggleSaved}
           aria-pressed={saved}
-          className="inline-flex h-11 flex-1 items-center justify-center rounded-full bg-accent px-5 text-sm font-semibold text-forest hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="inline-flex h-11 flex-[2] items-center justify-center rounded-full bg-accent px-5 text-sm font-semibold text-forest hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           {saved ? "Saved" : "Save"}
         </button>
 
+        <a
+          href={props.mapsUrl}
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex h-11 flex-1 items-center justify-center rounded-full bg-forest px-4 text-sm font-semibold text-sand ring-1 ring-moss/30 hover:bg-forest/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
+          Maps
+        </a>
+
         <button
           type="button"
           onClick={share}
-          className="inline-flex h-11 flex-1 items-center justify-center rounded-full bg-forest px-5 text-sm font-semibold text-sand ring-1 ring-moss/30 hover:bg-forest/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="inline-flex h-11 flex-1 items-center justify-center rounded-full bg-forest px-4 text-sm font-semibold text-sand ring-1 ring-moss/30 hover:bg-forest/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           {shared ? "Shared" : "Share"}
         </button>
