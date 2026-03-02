@@ -6,6 +6,7 @@ import HeroGallery from "@/app/components/campground-detail/HeroGallery";
 import SummaryCard from "@/app/components/campground-detail/SummaryCard";
 import QuickInfoBar from "@/app/components/campground-detail/QuickInfoBar";
 import HeroActions from "@/app/components/campground-detail/HeroActions";
+import HeroInfoHighlights from "@/app/components/campground-detail/HeroInfoHighlights";
 import MapPreview from "@/app/components/campground-detail/MapPreview";
 import TripTimeline from "@/app/components/campground-detail/TripTimeline";
 import BestSeason from "@/app/components/campground-detail/BestSeason";
@@ -510,6 +511,58 @@ export default async function DynamicDetailPage(props: {
       fields: record.fields,
     });
 
+    const travelTimeText =
+      pickString(record.fields, [
+        "Travel time from Bangkok",
+        "Travel Time from Bangkok",
+        "Travel time",
+        "Travel Time",
+        "Bangkok Travel Time",
+      ]) || toShortStringFromUnknown(record.fields["Travel time from Bangkok"]);
+
+    const nightTempText =
+      pickString(record.fields, [
+        "Night temperature range",
+        "Night Temp",
+        "Night Temperature",
+        "Temperature",
+        "Temp Range",
+      ]) || toShortStringFromUnknown(record.fields["Night temperature range"]);
+
+    const rainySeasonValue =
+      record.fields["Rainy season"] ??
+      record.fields["Rainy Season"] ??
+      record.fields["Rain season"] ??
+      record.fields["Rain Season"];
+    const rainySeasonText =
+      typeof rainySeasonValue === "boolean"
+        ? rainySeasonValue
+          ? "แนะนำ"
+          : "ไม่แนะนำ"
+        : toShortStringFromUnknown(rainySeasonValue);
+
+    const elevationValue =
+      record.fields["Elevation"] ??
+      record.fields["Elevation (m)"] ??
+      record.fields["Altitude"] ??
+      record.fields["Altitude (m)"] ??
+      record.fields["ความสูง"];
+    const elevationTextRaw = toShortStringFromUnknown(elevationValue);
+    const elevationText = elevationTextRaw
+      ? /m\b/i.test(elevationTextRaw)
+        ? elevationTextRaw
+        : `${elevationTextRaw}m`
+      : "";
+
+    const highlightFactsRaw =
+      record.fields["Highlight Facts"] ??
+      record.fields["Highlights"] ??
+      record.fields["Highlight"] ??
+      record.fields["จุดเด่น"];
+    const highlightFacts = toStringListFromUnknown(highlightFactsRaw);
+    const highlightFogText = highlightFacts[0];
+    const highlightSunriseText = highlightFacts[1];
+
     const quickInfoItems = [
       location
         ? { icon: "📍", label: "Location", value: location }
@@ -517,27 +570,12 @@ export default async function DynamicDetailPage(props: {
       {
         icon: "🚗",
         label: "Travel time",
-        value:
-          pickString(record.fields, [
-            "Travel time from Bangkok",
-            "Travel Time from Bangkok",
-            "Travel time",
-            "Travel Time",
-            "Bangkok Travel Time",
-          ]) ||
-          toShortStringFromUnknown(record.fields["Travel time from Bangkok"]),
+        value: travelTimeText,
       },
       {
         icon: "🌡",
         label: "Night temp",
-        value:
-          pickString(record.fields, [
-            "Night temperature range",
-            "Night Temp",
-            "Night Temperature",
-            "Temperature",
-            "Temp Range",
-          ]) || toShortStringFromUnknown(record.fields["Night temperature range"]),
+        value: nightTempText,
       },
       {
         icon: "⛺",
@@ -618,8 +656,20 @@ export default async function DynamicDetailPage(props: {
           </nav>
 
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-            <div className="lg:col-span-2">
+            <div className="lg:col-span-2 space-y-6">
               <HeroGallery title={title} images={images} />
+
+              <HeroInfoHighlights
+                bestMonths={bestSeasonMonths}
+                bestPeriodText={bestSeasonMonthsRaw}
+                rainySeasonText={rainySeasonText}
+                nightTempText={nightTempText}
+                rating={bestSeasonRating}
+                elevationText={elevationText}
+                highlightFogText={highlightFogText}
+                highlightSunriseText={highlightSunriseText}
+                travelTimeText={travelTimeText}
+              />
             </div>
 
             <div className="lg:col-span-1">
