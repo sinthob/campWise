@@ -15,7 +15,10 @@ export default function QuickInfoBar(props: { items: QuickInfoItem[] }) {
         role="list"
       >
         {items.map((item) => (
-          <li key={`${item.label}:${item.value}`} className="min-w-max md:min-w-0">
+          <li
+            key={`${item.label}:${item.value}`}
+            className="min-w-max md:min-w-0"
+          >
             <div className="inline-flex items-center gap-2 rounded-full bg-moss/15 px-3 py-2 text-sm text-sand ring-1 ring-moss/30">
               <span aria-hidden="true" className="text-sand/90">
                 {item.icon}

@@ -81,7 +81,9 @@ function groupByDay(planText: string): DayGroup[] {
   flush();
 
   // If nothing grouped (single buffer), show as Day 1.
-  return groups.length > 0 ? groups : [{ title: "Day 1", entries: parseEntries(lines) }];
+  return groups.length > 0
+    ? groups
+    : [{ title: "Day 1", entries: parseEntries(lines) }];
 }
 
 function AccordionSection(props: {
@@ -127,7 +129,10 @@ export default function TripTimeline(props: {
   const days = useMemo(() => groupByDay(props.planText), [props.planText]);
 
   return (
-    <section aria-label={props.title} className="rounded-3xl border border-moss/30 bg-forest p-5 text-sand shadow-sm">
+    <section
+      aria-label={props.title}
+      className="rounded-3xl border border-moss/30 bg-forest p-5 text-sand shadow-sm"
+    >
       <header>
         <h3 className="text-base font-semibold sm:text-lg">{props.title}</h3>
         <p className="mt-1 text-sm leading-6 text-sand/70">{props.intro}</p>
@@ -136,10 +141,17 @@ export default function TripTimeline(props: {
       <div className="mt-4 space-y-3">
         {days.length > 0 ? (
           days.map((day) => (
-            <AccordionSection key={day.title} title={day.title} defaultOpen={false}>
+            <AccordionSection
+              key={day.title}
+              title={day.title}
+              defaultOpen={false}
+            >
               <ol className="relative space-y-3 border-l border-moss/40 pl-4">
                 {day.entries.map((entry, idx) => (
-                  <li key={`${idx}-${entry.time ?? ""}-${entry.description}`} className="relative">
+                  <li
+                    key={`${idx}-${entry.time ?? ""}-${entry.description}`}
+                    className="relative"
+                  >
                     <span
                       className="absolute -left-[9px] top-1.5 h-4 w-4 rounded-full bg-accent ring-4 ring-forest"
                       aria-hidden="true"
@@ -149,7 +161,9 @@ export default function TripTimeline(props: {
                       <div className="text-xs font-semibold uppercase tracking-wide text-sand/70">
                         {entry.time ?? ""}
                       </div>
-                      <div className="text-sm leading-[1.7] text-sand/85">{entry.description}</div>
+                      <div className="text-sm leading-[1.7] text-sand/85">
+                        {entry.description}
+                      </div>
                     </div>
                   </li>
                 ))}

@@ -9,7 +9,10 @@ export default function EssentialsRow(props: { items: EssentialItem[] }) {
   if (items.length === 0) return null;
 
   return (
-    <section aria-label="Essentials" className="rounded-2xl bg-forest/60 p-4 ring-1 ring-moss/30">
+    <section
+      aria-label="Essentials"
+      className="rounded-2xl bg-forest/60 p-4 ring-1 ring-moss/30"
+    >
       <ul className="flex flex-wrap gap-2">
         {items.map((item) => (
           <li

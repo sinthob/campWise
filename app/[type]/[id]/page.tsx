@@ -1,6 +1,10 @@
 import Link from "next/link";
 
-import { fetchAirtableRecordById, getFirstAttachmentUrl } from "@/lib/airtable";
+import {
+  fetchAirtableRecordById,
+  fetchAirtableTablePage,
+  getFirstAttachmentUrl,
+} from "@/lib/airtable";
 
 import HeroGallery from "@/app/components/campground-detail/HeroGallery";
 import SummaryCard from "@/app/components/campground-detail/SummaryCard";
@@ -11,6 +15,7 @@ import MapPreview from "@/app/components/campground-detail/MapPreview";
 import TripTimeline from "@/app/components/campground-detail/TripTimeline";
 import BestSeason from "@/app/components/campground-detail/BestSeason";
 import GearSuggestion from "@/app/components/campground-detail/GearSuggestion";
+import RecommendedGearCards from "@/app/components/campground-detail/RecommendedGearCards";
 import MobileStickyCTA from "@/app/components/campground-detail/MobileStickyCTA";
 
 export const dynamic = "force-dynamic";
@@ -424,6 +429,13 @@ function parseAiInsightJson(raw: string | undefined | null): {
   }
 }
 
+function normalizeGearType(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 export default async function DynamicDetailPage(props: {
   params: Promise<{ type: string; id: string }>;
 }) {
@@ -564,9 +576,7 @@ export default async function DynamicDetailPage(props: {
     const highlightSunriseText = highlightFacts[1];
 
     const quickInfoItems = [
-      location
-        ? { icon: "📍", label: "Location", value: location }
-        : null,
+      location ? { icon: "📍", label: "Location", value: location } : null,
       {
         icon: "🚗",
         label: "Travel time",
@@ -639,9 +649,73 @@ export default async function DynamicDetailPage(props: {
       record.fields["Gear Suggestion"] ??
       record.fields["What to bring"] ??
       record.fields["What to bring / Tips"] ??
-      record.fields["Recommended Gear"] ??
       record.fields["Packing List"];
     const gearItems = toStringListFromUnknown(gearSuggestionRaw);
+
+    // Recommended gear types (AI-filled): e.g. "อุปกรณ์กันหนาว", "เต็นท์".
+    const recommendedGearTypesRaw =
+      record.fields["Recommended Gear"] ??
+      record.fields["Recommended Gear Types"] ??
+      record.fields["Recommended Gear Type"];
+    const recommendedGearTypes = toStringListFromUnknown(recommendedGearTypesRaw)
+      .map((t) => t.trim())
+      .filter(Boolean);
+
+    const recommendedTypeSet = new Set(
+      recommendedGearTypes.map((t) => normalizeGearType(t)),
+    );
+
+    const gearCfg = TYPE_CONFIG.gear;
+    const gearTableName = process.env.AIRTABLE_DATA_PATH
+      ? gearCfg.defaultTableName
+      : (process.env[gearCfg.tableEnvVar ?? ""] ?? gearCfg.defaultTableName);
+
+    const gearPool = recommendedTypeSet.size
+      ? await fetchAirtableTablePage<Record<string, unknown>>({
+          tableName: gearTableName,
+          page: 1,
+          pageSize: 50,
+          // We filter in-memory because Airtable filterByFormula in this repo
+          // currently supports a single equality clause.
+        })
+      : null;
+
+    const recommendedGearItems = (gearPool?.records ?? [])
+      .map((r) => {
+        const fields = r.fields as Record<string, unknown>;
+        const title = pickString(fields, gearCfg.titleKeys) || "Untitled";
+
+        const gearTypeValue =
+          fields["Gear Type"] ??
+          fields["Gear Types"] ??
+          fields["Type"] ??
+          fields["Category"];
+        const gearTypeLabel = toShortStringFromUnknown(gearTypeValue);
+        const gearTypeTokens = toStringListFromUnknown(gearTypeValue);
+
+        const matches =
+          recommendedTypeSet.size === 0
+            ? false
+            : gearTypeTokens.some((t) => recommendedTypeSet.has(normalizeGearType(t))) ||
+              (gearTypeLabel
+                ? recommendedTypeSet.has(normalizeGearType(gearTypeLabel))
+                : false);
+
+        if (!matches) return null;
+
+        return {
+          id: r.id,
+          title,
+          gearType: gearTypeLabel,
+          imageUrl: getAnyAttachmentImageUrl(fields, gearCfg.imageKeys),
+        };
+      })
+      .filter(Boolean) as Array<{
+      id: string;
+      title: string;
+      gearType?: string;
+      imageUrl?: string;
+    }>;
 
     return (
       <div className="min-h-screen bg-forest px-4 py-8 text-sand">
@@ -669,6 +743,11 @@ export default async function DynamicDetailPage(props: {
                 highlightFogText={highlightFogText}
                 highlightSunriseText={highlightSunriseText}
                 travelTimeText={travelTimeText}
+              />
+
+              <RecommendedGearCards
+                gearTypes={recommendedGearTypes}
+                items={recommendedGearItems}
               />
             </div>
 
@@ -713,7 +792,10 @@ export default async function DynamicDetailPage(props: {
             </div>
           </section>
 
-          <section aria-label="Season and gear" className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          <section
+            aria-label="Season and gear"
+            className="grid grid-cols-1 gap-6 md:grid-cols-2"
+          >
             <BestSeason months={bestSeasonMonths} rating={bestSeasonRating} />
             <GearSuggestion recordId={id} items={gearItems} />
           </section>

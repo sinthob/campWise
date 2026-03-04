@@ -31,7 +31,10 @@ function RatingStars(props: RatingStarsProps) {
   );
 }
 
-function extractTemps(value: string | undefined): { min?: number; max?: number } {
+function extractTemps(value: string | undefined): {
+  min?: number;
+  max?: number;
+} {
   if (!value) return {};
 
   const matches = value.match(/\d{1,2}/g);
@@ -73,8 +76,12 @@ function TempBar(props: { label: string; value?: string }) {
   return (
     <div className="mt-4" aria-label={props.label}>
       <div className="flex items-center justify-between">
-        <span className="text-xs font-semibold text-sand/70">{props.label}</span>
-        <span className="text-xs font-semibold text-sand">{props.value || "—"}</span>
+        <span className="text-xs font-semibold text-sand/70">
+          {props.label}
+        </span>
+        <span className="text-xs font-semibold text-sand">
+          {props.value || "—"}
+        </span>
       </div>
       <div className="mt-2 grid grid-cols-5 gap-1" aria-hidden="true">
         {Array.from({ length: 5 }).map((_, idx) => (
@@ -135,7 +142,9 @@ function InfoRow(props: { icon: string; label: string; value?: string }) {
         </span>
         {props.label}
       </dt>
-      <dd className="text-sm font-semibold text-sand/80">{props.value || "—"}</dd>
+      <dd className="text-sm font-semibold text-sand/80">
+        {props.value || "—"}
+      </dd>
     </div>
   );
 }
@@ -152,7 +161,9 @@ function HighlightGrid(props: { items: HighlightItem[] }) {
             {item.icon}
           </span>
           <div className="min-w-0">
-            <div className="text-xs font-semibold text-sand/70">{item.label}</div>
+            <div className="text-xs font-semibold text-sand/70">
+              {item.label}
+            </div>
             <div className="mt-0.5 text-sm font-semibold text-sand">
               {item.value || "—"}
             </div>
@@ -164,7 +175,9 @@ function HighlightGrid(props: { items: HighlightItem[] }) {
 }
 
 export default function HeroInfoHighlights(props: HeroInfoHighlightsProps) {
-  const bestMonths = (props.bestMonths ?? []).map((m) => m.trim()).filter(Boolean);
+  const bestMonths = (props.bestMonths ?? [])
+    .map((m) => m.trim())
+    .filter(Boolean);
 
   const highlights: HighlightItem[] = [
     { icon: "🏔", label: "ความสูง", value: props.elevationText },
@@ -202,7 +215,10 @@ export default function HeroInfoHighlights(props: HeroInfoHighlightsProps) {
           <InfoRow
             icon="🌤"
             label="ช่วงที่ดีที่สุด"
-            value={props.bestPeriodText || (bestMonths.length ? bestMonths.join(", ") : undefined)}
+            value={
+              props.bestPeriodText ||
+              (bestMonths.length ? bestMonths.join(", ") : undefined)
+            }
           />
           <InfoRow icon="🌧" label="ฤดูฝน" value={props.rainySeasonText} />
         </dl>

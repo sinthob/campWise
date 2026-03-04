@@ -30,7 +30,10 @@ function parseTimeline(planText: string): TimelineItem[] {
     const timeMatch = line.match(/(?:^|\s)(\d{1,2}[:\.]\d{2})(?:\s|$)/);
     if (timeMatch) {
       const time = normalizeTimeToken(timeMatch[1]);
-      const activity = line.replace(timeMatch[1], "").replace(/^[\s\-–—:]+/, "").trim();
+      const activity = line
+        .replace(timeMatch[1], "")
+        .replace(/^[\s\-–—:]+/, "")
+        .trim();
       items.push({ time, activity: activity || line.trim() });
       continue;
     }
@@ -75,7 +78,10 @@ export default function TripCard(props: {
 }) {
   const contentId = useId();
 
-  const timeline = useMemo(() => parseTimeline(props.planText), [props.planText]);
+  const timeline = useMemo(
+    () => parseTimeline(props.planText),
+    [props.planText],
+  );
   const storageKey = `campwise:saved:${props.recordId}:${props.planKey}`;
 
   const [open, setOpen] = useState(props.defaultOpen ?? false);

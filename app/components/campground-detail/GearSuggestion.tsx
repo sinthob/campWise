@@ -43,7 +43,10 @@ export default function GearSuggestion(props: {
   }
 
   return (
-    <section aria-label="Gear suggestion" className="rounded-3xl border border-moss/30 bg-forest p-5 text-sand shadow-sm">
+    <section
+      aria-label="Gear suggestion"
+      className="rounded-3xl border border-moss/30 bg-forest p-5 text-sand shadow-sm"
+    >
       <div className="flex items-center justify-between gap-4">
         <h2 className="text-base font-semibold">🎒 Gear Suggestion</h2>
         <button

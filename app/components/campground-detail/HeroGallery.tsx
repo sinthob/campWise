@@ -7,7 +7,9 @@ export default function HeroGallery(props: {
   title: string;
   images: HeroGalleryImage[];
 }) {
-  const images = props.images.filter((img) => typeof img.url === "string" && img.url);
+  const images = props.images.filter(
+    (img) => typeof img.url === "string" && img.url,
+  );
 
   return (
     <section
@@ -29,10 +31,7 @@ export default function HeroGallery(props: {
           </div>
 
           {images.length > 1 ? (
-            <ul
-              className="grid grid-cols-4 gap-3"
-              aria-label="More photos"
-            >
+            <ul className="grid grid-cols-4 gap-3" aria-label="More photos">
               {images.slice(1, 5).map((img) => (
                 <li
                   key={img.url}

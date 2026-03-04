@@ -4,7 +4,10 @@ export default function MapPreview(props: {
   mapsUrl: string;
 }) {
   return (
-    <section aria-label="Map preview" className="rounded-3xl border border-moss/30 bg-forest p-4 text-sand shadow-sm">
+    <section
+      aria-label="Map preview"
+      className="rounded-3xl border border-moss/30 bg-forest p-4 text-sand shadow-sm"
+    >
       <div className="flex items-center justify-between gap-3">
         <h2 className="text-base font-semibold">Map</h2>
         <a

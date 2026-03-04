@@ -10,17 +10,26 @@ function clampRating(rating: number) {
 
 export default function BestSeason(props: BestSeasonProps) {
   const months = (props.months ?? []).map((m) => m.trim()).filter(Boolean);
-  const rating = props.rating !== undefined ? clampRating(props.rating) : undefined;
+  const rating =
+    props.rating !== undefined ? clampRating(props.rating) : undefined;
 
   if (months.length === 0 && rating === undefined) return null;
 
   return (
-    <section aria-label="Best season" className="rounded-3xl border border-moss/30 bg-forest p-5 text-sand shadow-sm">
+    <section
+      aria-label="Best season"
+      className="rounded-3xl border border-moss/30 bg-forest p-5 text-sand shadow-sm"
+    >
       <h2 className="text-base font-semibold">🌤 Best Season</h2>
 
       {rating !== undefined ? (
-        <p className="mt-2 text-sm text-sand/80" aria-label={`Rating ${rating} out of 5`}>
-          {Array.from({ length: 5 }).map((_, idx) => (idx < rating ? "⭐" : "☆")).join("")}
+        <p
+          className="mt-2 text-sm text-sand/80"
+          aria-label={`Rating ${rating} out of 5`}
+        >
+          {Array.from({ length: 5 })
+            .map((_, idx) => (idx < rating ? "⭐" : "☆"))
+            .join("")}
         </p>
       ) : null}
 
