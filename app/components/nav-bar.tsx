@@ -4,8 +4,9 @@ import Link from "next/link";
 import { useTheme } from "next-themes";
 
 export default function NavBar() {
-  const { resolvedTheme, setTheme } = useTheme();
-  const isDark = resolvedTheme === "dark";
+  const { resolvedTheme, theme, setTheme } = useTheme();
+  const activeTheme = resolvedTheme ?? theme;
+  const isDark = activeTheme === "dark";
 
   return (
     <header className="sticky top-0 z-50 border-b border-moss/30 bg-forest text-sand shadow-md">
