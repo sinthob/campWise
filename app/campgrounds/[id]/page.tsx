@@ -106,17 +106,17 @@ export default async function CampgroundDetailsPage(props: {
   ]);
 
   return (
-    <div className="min-h-screen bg-background px-4 py-10 text-foreground">
+    <div className="min-h-screen bg-white px-4 py-10 text-foreground dark:bg-forest dark:text-sand">
       <div className="mx-auto w-full max-w-4xl space-y-8">
         <Link
           href="/campgrounds"
-          className="text-sm font-medium text-foreground/80 hover:text-accent"
+          className="text-sm font-medium text-slate-700 hover:text-primary dark:text-sand/80 dark:hover:text-accent"
         >
           ← Back to Campgrounds
         </Link>
 
-        <section className="overflow-hidden rounded-3xl border border-moss/30 bg-forest shadow-sm">
-          <div className="h-[400px] w-full bg-moss">
+        <section className="overflow-hidden rounded-3xl border border-zinc-200 bg-white shadow-sm dark:border-moss/30 dark:bg-forest">
+          <div className="h-[400px] w-full bg-zinc-100 dark:bg-moss">
             {imageUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
@@ -126,7 +126,7 @@ export default async function CampgroundDetailsPage(props: {
                 loading="lazy"
               />
             ) : (
-              <div className="flex h-full w-full items-center justify-center text-sm text-sand/70">
+              <div className="flex h-full w-full items-center justify-center text-sm text-zinc-500 dark:text-sand/70">
                 No image
               </div>
             )}
@@ -143,20 +143,22 @@ export default async function CampgroundDetailsPage(props: {
         </header>
 
         {aiSummary ? (
-          <section className="rounded-2xl border border-moss/30 bg-moss/10 p-6">
-            <h2 className="text-base font-semibold text-foreground">
+          <section className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-moss/30 dark:bg-moss/10">
+            <h2 className="text-base font-semibold text-foreground dark:text-sand">
               🤖 AI Summary
             </h2>
-            <p className="mt-2 whitespace-pre-line text-sm leading-7 text-foreground/80">
+            <p className="mt-2 whitespace-pre-line text-sm leading-7 text-slate-700 dark:text-sand/80">
               {aiSummary}
             </p>
           </section>
         ) : null}
 
         {rawReview ? (
-          <section className="rounded-2xl border border-moss/30 bg-forest p-6 text-sand">
-            <h2 className="text-base font-semibold">📝 Raw Reviews</h2>
-            <p className="mt-2 whitespace-pre-line text-sm leading-7 text-sand/80">
+          <section className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-moss/30 dark:bg-forest dark:text-sand">
+            <h2 className="text-base font-semibold text-foreground dark:text-sand">
+              📝 Raw Reviews
+            </h2>
+            <p className="mt-2 whitespace-pre-line text-sm leading-7 text-slate-700 dark:text-sand/80">
               {rawReview}
             </p>
           </section>
