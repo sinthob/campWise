@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 function safeLocalStorageGet(key: string): string | null {
   try {
@@ -24,13 +24,8 @@ export default function MobileStickyCTA(props: {
   mapsUrl: string;
 }) {
   const storageKey = `campwise:saved:${props.recordId}:campground`;
-  const [saved, setSaved] = useState(false);
+  const [saved, setSaved] = useState(() => safeLocalStorageGet(storageKey) === "1");
   const [shared, setShared] = useState(false);
-
-  useEffect(() => {
-    const v = safeLocalStorageGet(storageKey);
-    setSaved(v === "1");
-  }, [storageKey]);
 
   function toggleSaved() {
     const next = !saved;
@@ -56,7 +51,7 @@ export default function MobileStickyCTA(props: {
 
   return (
     <div
-      className="fixed inset-x-0 bottom-0 z-50 border-t border-moss/30 bg-forest/95 px-4 py-3 backdrop-blur md:hidden"
+      className="fixed inset-x-0 bottom-0 z-50 border-t border-zinc-200 bg-white/95 px-4 py-3 backdrop-blur md:hidden dark:border-moss/30 dark:bg-forest/95"
       role="region"
       aria-label="Actions"
     >
@@ -74,7 +69,7 @@ export default function MobileStickyCTA(props: {
           href={props.mapsUrl}
           target="_blank"
           rel="noreferrer"
-          className="inline-flex h-11 flex-1 items-center justify-center rounded-full bg-forest px-4 text-sm font-semibold text-sand ring-1 ring-moss/30 hover:bg-forest/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="inline-flex h-11 flex-1 items-center justify-center rounded-full border border-zinc-200 bg-white px-4 text-sm font-semibold text-foreground hover:border-primary/30 hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent dark:border-transparent dark:bg-forest dark:text-sand dark:ring-1 dark:ring-moss/30 dark:hover:bg-forest/80"
         >
           Maps
         </a>
@@ -82,7 +77,7 @@ export default function MobileStickyCTA(props: {
         <button
           type="button"
           onClick={share}
-          className="inline-flex h-11 flex-1 items-center justify-center rounded-full bg-forest px-4 text-sm font-semibold text-sand ring-1 ring-moss/30 hover:bg-forest/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="inline-flex h-11 flex-1 items-center justify-center rounded-full border border-zinc-200 bg-white px-4 text-sm font-semibold text-foreground hover:border-primary/30 hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent dark:border-transparent dark:bg-forest dark:text-sand dark:ring-1 dark:ring-moss/30 dark:hover:bg-forest/80"
         >
           {shared ? "Shared" : "Share"}
         </button>

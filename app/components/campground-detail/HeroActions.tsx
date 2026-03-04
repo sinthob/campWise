@@ -68,7 +68,7 @@ export default function HeroActions(props: {
           href={props.mapsUrl}
           target="_blank"
           rel="noreferrer"
-          className="inline-flex h-12 w-full items-center justify-center rounded-full bg-forest px-5 text-sm font-semibold text-sand ring-1 ring-moss/30 hover:bg-forest/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="inline-flex h-12 w-full items-center justify-center rounded-full border border-zinc-200 bg-white px-5 text-sm font-semibold text-foreground hover:border-primary/30 hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent dark:border-transparent dark:bg-forest dark:text-sand dark:ring-1 dark:ring-moss/30 dark:hover:bg-forest/80"
         >
           🗺 Open in Google Maps
         </a>
@@ -76,7 +76,7 @@ export default function HeroActions(props: {
         <button
           type="button"
           onClick={share}
-          className="inline-flex h-12 w-full items-center justify-center rounded-full bg-forest px-5 text-sm font-semibold text-sand ring-1 ring-moss/30 hover:bg-forest/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent sm:col-span-2"
+          className="inline-flex h-12 w-full items-center justify-center rounded-full border border-zinc-200 bg-white px-5 text-sm font-semibold text-foreground hover:border-primary/30 hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent dark:border-transparent dark:bg-forest dark:text-sand dark:ring-1 dark:ring-moss/30 dark:hover:bg-forest/80 sm:col-span-2"
         >
           {shared ? "📤 Shared" : "📤 Share"}
         </button>

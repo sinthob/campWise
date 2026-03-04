@@ -45,7 +45,7 @@ export default function GearSuggestion(props: {
   return (
     <section
       aria-label="Gear suggestion"
-      className="rounded-3xl border border-moss/30 bg-forest p-5 text-sand shadow-sm"
+      className="rounded-3xl border border-zinc-200 bg-white p-5 text-foreground shadow-sm dark:border-moss/30 dark:bg-forest dark:text-sand"
     >
       <div className="flex items-center justify-between gap-4">
         <h2 className="text-base font-semibold">🎒 Gear Suggestion</h2>
@@ -59,13 +59,13 @@ export default function GearSuggestion(props: {
         </button>
       </div>
 
-      <ul className="mt-4 list-disc space-y-2 pl-5 text-base leading-[1.7] text-sand/85">
+      <ul className="mt-4 list-disc space-y-2 pl-5 text-base leading-[1.7] text-slate-700 dark:text-sand/85">
         {items.map((item) => (
           <li key={item}>{item}</li>
         ))}
       </ul>
 
-      <p className="mt-3 text-sm text-sand/70">
+      <p className="mt-3 text-sm text-slate-600 dark:text-sand/70">
         Important items are highlighted by order — review before packing.
       </p>
     </section>

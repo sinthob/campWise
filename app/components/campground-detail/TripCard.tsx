@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useMemo, useState } from "react";
+import { useId, useMemo, useState } from "react";
 
 type TimelineItem = {
   time?: string;
@@ -85,13 +85,8 @@ export default function TripCard(props: {
   const storageKey = `campwise:saved:${props.recordId}:${props.planKey}`;
 
   const [open, setOpen] = useState(props.defaultOpen ?? false);
-  const [saved, setSaved] = useState(false);
+  const [saved, setSaved] = useState(() => safeLocalStorageGet(storageKey) === "1");
   const [copied, setCopied] = useState(false);
-
-  useEffect(() => {
-    const v = safeLocalStorageGet(storageKey);
-    setSaved(v === "1");
-  }, [storageKey]);
 
   function toggleSaved() {
     const next = !saved;

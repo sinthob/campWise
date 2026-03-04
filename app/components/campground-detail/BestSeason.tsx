@@ -18,13 +18,13 @@ export default function BestSeason(props: BestSeasonProps) {
   return (
     <section
       aria-label="Best season"
-      className="rounded-3xl border border-moss/30 bg-forest p-5 text-sand shadow-sm"
+      className="rounded-3xl border border-zinc-200 bg-white p-5 text-foreground shadow-sm dark:border-moss/30 dark:bg-forest dark:text-sand"
     >
       <h2 className="text-base font-semibold">🌤 Best Season</h2>
 
       {rating !== undefined ? (
         <p
-          className="mt-2 text-sm text-sand/80"
+          className="mt-2 text-sm text-slate-600 dark:text-sand/80"
           aria-label={`Rating ${rating} out of 5`}
         >
           {Array.from({ length: 5 })
@@ -38,7 +38,7 @@ export default function BestSeason(props: BestSeasonProps) {
           {months.map((m) => (
             <li
               key={m}
-              className="inline-flex items-center rounded-full bg-moss/15 px-3 py-2 text-sm font-semibold text-sand ring-1 ring-moss/30"
+              className="inline-flex items-center rounded-full bg-primary/10 px-3 py-2 text-sm font-semibold text-foreground ring-1 ring-primary/20 dark:bg-moss/15 dark:text-sand dark:ring-moss/30"
             >
               {m}
             </li>

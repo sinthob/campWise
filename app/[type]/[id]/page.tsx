@@ -718,12 +718,12 @@ export default async function DynamicDetailPage(props: {
     }>;
 
     return (
-      <div className="min-h-screen bg-forest px-4 py-8 text-sand">
+      <div className="min-h-screen bg-background px-4 py-8 text-foreground dark:bg-forest dark:text-sand">
         <div className="mx-auto w-full max-w-6xl space-y-8 pb-24 md:pb-10">
           <nav aria-label="Breadcrumb">
             <Link
               href={cfg.listHref}
-              className="text-sm font-medium text-sand/80 hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="text-sm font-medium text-slate-700 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent dark:text-sand/80 dark:hover:text-accent"
             >
               ← Back
             </Link>
@@ -772,7 +772,7 @@ export default async function DynamicDetailPage(props: {
               <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">
                 Trip Plans
               </h2>
-              <p className="text-sm leading-6 text-sand/70">
+              <p className="text-sm leading-6 text-slate-600 dark:text-sand/70">
                 Clean, readable timelines for quick planning.
               </p>
             </header>

@@ -26,7 +26,7 @@ export default function RecommendedGearCards(props: {
           {gearTypes.slice(0, 8).map((t) => (
             <span
               key={t}
-              className="inline-flex items-center rounded-full border border-moss/40 bg-forest/40 px-3 py-1 text-xs font-medium text-sand/80"
+              className="inline-flex items-center rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-xs font-medium text-slate-700 dark:border-moss/40 dark:bg-forest/40 dark:text-sand/80"
             >
               {t}
             </span>
@@ -40,9 +40,9 @@ export default function RecommendedGearCards(props: {
             <Link
               key={g.id}
               href={`/gear/${g.id}`}
-              className="group flex items-center gap-3 rounded-2xl border border-moss/30 bg-forest/40 p-3 hover:bg-forest/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="group flex items-center gap-3 rounded-2xl border border-zinc-200 bg-white p-3 hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent dark:border-moss/30 dark:bg-forest/40 dark:hover:bg-forest/60"
             >
-              <div className="h-12 w-12 flex-none overflow-hidden rounded-xl bg-moss/20">
+              <div className="h-12 w-12 flex-none overflow-hidden rounded-xl bg-zinc-100 dark:bg-moss/20">
                 {g.imageUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
@@ -55,24 +55,24 @@ export default function RecommendedGearCards(props: {
               </div>
 
               <div className="min-w-0">
-                <div className="truncate text-sm font-semibold text-sand">
+                <div className="truncate text-sm font-semibold text-foreground dark:text-sand">
                   {g.title}
                 </div>
                 {g.gearType ? (
-                  <div className="mt-0.5 truncate text-xs text-sand/70">
+                  <div className="mt-0.5 truncate text-xs text-slate-600 dark:text-sand/70">
                     {g.gearType}
                   </div>
                 ) : null}
               </div>
 
-              <div className="ml-auto flex-none text-sand/60 transition group-hover:text-accent">
+              <div className="ml-auto flex-none text-zinc-400 transition group-hover:text-primary dark:text-sand/60 dark:group-hover:text-accent">
                 →
               </div>
             </Link>
           ))}
         </div>
       ) : (
-        <div className="rounded-2xl border border-moss/30 bg-forest/30 p-4 text-sm text-sand/70">
+        <div className="rounded-2xl border border-zinc-200 bg-white p-4 text-sm text-slate-600 dark:border-moss/30 dark:bg-forest/30 dark:text-sand/70">
           No gear items match these types yet.
         </div>
       )}

@@ -19,12 +19,14 @@ function RatingStars(props: RatingStarsProps) {
         <span
           key={idx}
           aria-hidden="true"
-          className={idx < rating ? "text-accent" : "text-sand/40"}
+          className={
+            idx < rating ? "text-accent" : "text-zinc-300 dark:text-sand/40"
+          }
         >
           ★
         </span>
       ))}
-      <span className="ml-2 text-xs font-semibold text-sand/70">
+      <span className="ml-2 text-xs font-semibold text-slate-600 dark:text-sand/70">
         {rating}/5
       </span>
     </div>
@@ -76,10 +78,10 @@ function TempBar(props: { label: string; value?: string }) {
   return (
     <div className="mt-4" aria-label={props.label}>
       <div className="flex items-center justify-between">
-        <span className="text-xs font-semibold text-sand/70">
+        <span className="text-xs font-semibold text-slate-600 dark:text-sand/70">
           {props.label}
         </span>
-        <span className="text-xs font-semibold text-sand">
+        <span className="text-xs font-semibold text-foreground dark:text-sand">
           {props.value || "—"}
         </span>
       </div>
@@ -87,8 +89,10 @@ function TempBar(props: { label: string; value?: string }) {
         {Array.from({ length: 5 }).map((_, idx) => (
           <div
             key={idx}
-            className={`h-2 rounded-full ring-1 ring-moss/30 ${
-              idx < activeSegments ? "bg-accent" : "bg-moss/15"
+            className={`h-2 rounded-full ring-1 ring-zinc-200 dark:ring-moss/30 ${
+              idx < activeSegments
+                ? "bg-accent"
+                : "bg-zinc-100 dark:bg-moss/15"
             }`}
           />
         ))}
@@ -124,7 +128,7 @@ function MonthBadges(props: { months: string[] }) {
     <ul className="flex flex-wrap gap-2" aria-label="Best months">
       {months.slice(0, 6).map((m) => (
         <li key={m}>
-          <span className="inline-flex items-center rounded-full bg-moss/15 px-3 py-1 text-xs font-semibold text-sand ring-1 ring-moss/30">
+          <span className="inline-flex items-center rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-foreground ring-1 ring-primary/20 dark:bg-moss/15 dark:text-sand dark:ring-moss/30">
             {m}
           </span>
         </li>
@@ -136,13 +140,13 @@ function MonthBadges(props: { months: string[] }) {
 function InfoRow(props: { icon: string; label: string; value?: string }) {
   return (
     <div className="flex items-start justify-between gap-4">
-      <dt className="text-sm font-semibold text-sand">
+      <dt className="text-sm font-semibold text-foreground dark:text-sand">
         <span aria-hidden="true" className="mr-2">
           {props.icon}
         </span>
         {props.label}
       </dt>
-      <dd className="text-sm font-semibold text-sand/80">
+      <dd className="text-sm font-semibold text-slate-700 dark:text-sand/80">
         {props.value || "—"}
       </dd>
     </div>
@@ -155,16 +159,19 @@ function HighlightGrid(props: { items: HighlightItem[] }) {
       {props.items.map((item) => (
         <div
           key={item.label}
-          className="flex min-h-[58px] items-start gap-3 rounded-xl bg-forest/60 p-3 ring-1 ring-moss/20"
+          className="flex min-h-[58px] items-start gap-3 rounded-xl bg-zinc-50 p-3 ring-1 ring-zinc-200 dark:bg-forest/60 dark:ring-moss/20"
         >
-          <span aria-hidden="true" className="mt-0.5 text-sand/90">
+          <span
+            aria-hidden="true"
+            className="mt-0.5 text-foreground dark:text-sand/90"
+          >
             {item.icon}
           </span>
           <div className="min-w-0">
-            <div className="text-xs font-semibold text-sand/70">
+            <div className="text-xs font-semibold text-slate-600 dark:text-sand/70">
               {item.label}
             </div>
-            <div className="mt-0.5 text-sm font-semibold text-sand">
+            <div className="mt-0.5 text-sm font-semibold text-foreground dark:text-sand">
               {item.value || "—"}
             </div>
           </div>
@@ -191,11 +198,11 @@ export default function HeroInfoHighlights(props: HeroInfoHighlightsProps) {
       aria-label="Hero info highlights"
       className="grid grid-cols-1 gap-6 md:grid-cols-2"
     >
-      <div className="h-full rounded-xl border border-moss/30 bg-moss/10 p-5 text-sand shadow-sm">
+      <div className="h-full rounded-xl border border-zinc-200 bg-white p-5 text-foreground shadow-sm dark:border-moss/30 dark:bg-moss/10 dark:text-sand">
         <div className="flex items-start justify-between gap-4">
           <div>
             <h2 className="text-base font-semibold">Best Time to Visit</h2>
-            <p className="mt-1 text-sm text-sand/70">
+            <p className="mt-1 text-sm text-slate-600 dark:text-sand/70">
               Quick seasonal view for trip planning.
             </p>
           </div>
@@ -226,10 +233,10 @@ export default function HeroInfoHighlights(props: HeroInfoHighlightsProps) {
         <TempBar label="กลางคืน" value={props.nightTempText} />
       </div>
 
-      <div className="h-full rounded-xl border border-moss/30 bg-moss/10 p-5 text-sand shadow-sm">
+      <div className="h-full rounded-xl border border-zinc-200 bg-white p-5 text-foreground shadow-sm dark:border-moss/30 dark:bg-moss/10 dark:text-sand">
         <div>
           <h2 className="text-base font-semibold">Elevation + Highlights</h2>
-          <p className="mt-1 text-sm text-sand/70">
+          <p className="mt-1 text-sm text-slate-600 dark:text-sand/70">
             Key facts in a compact 2×2 grid.
           </p>
         </div>
