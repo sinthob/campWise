@@ -4,15 +4,17 @@ import Link from "next/link";
 import { useTheme } from "next-themes";
 
 export default function NavBar() {
-  const { resolvedTheme, theme, setTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
 
-  // next-themes can briefly report a stale theme value during hydration.
-  // The most reliable source of truth for the currently-applied theme is
-  // whether the provider has applied the `dark` class on <html>.
-  const isDark =
-    typeof document !== "undefined"
-      ? document.documentElement.classList.contains("dark")
-      : (resolvedTheme ?? theme) === "dark";
+  function getCurrentTheme(): "light" | "dark" {
+    if (theme === "light" || theme === "dark") return theme;
+    if (typeof document === "undefined") return "light";
+    return document.documentElement.classList.contains("dark")
+      ? "dark"
+      : "light";
+  }
+
+  const isDark = getCurrentTheme() === "dark";
 
   return (
     <header className="sticky top-0 z-50 border-b border-moss/30 bg-forest text-sand shadow-md">
@@ -45,7 +47,8 @@ export default function NavBar() {
         <button
           type="button"
           onClick={() => {
-            setTheme(isDark ? "light" : "dark");
+            const current = getCurrentTheme();
+            setTheme(current === "dark" ? "light" : "dark");
           }}
           aria-label="Toggle dark mode"
           className="inline-flex h-10 items-center justify-center rounded-full border border-moss/40 bg-forest px-4 text-sm font-semibold text-sand hover:bg-moss/20"
