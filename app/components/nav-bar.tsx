@@ -2,19 +2,34 @@
 
 import Link from "next/link";
 import { useTheme } from "next-themes";
+import { useEffect } from "react";
 
 export default function NavBar() {
-  const { theme, setTheme } = useTheme();
+  const { theme, resolvedTheme, setTheme } = useTheme();
 
-  function getCurrentTheme(): "light" | "dark" {
-    if (theme === "light" || theme === "dark") return theme;
-    if (typeof document === "undefined") return "light";
-    return document.documentElement.classList.contains("dark")
-      ? "dark"
-      : "light";
-  }
+  const currentTheme: "light" | "dark" =
+    resolvedTheme === "light" || resolvedTheme === "dark"
+      ? resolvedTheme
+      : theme === "light" || theme === "dark"
+        ? theme
+        : typeof document !== "undefined" &&
+            document.documentElement.classList.contains("dark")
+          ? "dark"
+          : "light";
 
-  const isDark = getCurrentTheme() === "dark";
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+
+    const root = document.documentElement;
+
+    // Tailwind dark mode is driven by `.dark` on an ancestor.
+    root.classList.toggle("dark", currentTheme === "dark");
+
+    // Defensive cleanup: avoid any stray `light` class affecting styling.
+    root.classList.remove("light");
+  }, [currentTheme]);
+
+  const isDark = currentTheme === "dark";
 
   return (
     <header className="sticky top-0 z-50 border-b border-zinc-200 bg-white text-foreground shadow-sm dark:border-moss/30 dark:bg-forest dark:text-sand">
@@ -47,21 +62,8 @@ export default function NavBar() {
         <button
           type="button"
           onClick={() => {
-            const current = getCurrentTheme();
-            const next = current === "dark" ? "light" : "dark";
+            const next = currentTheme === "dark" ? "light" : "dark";
             setTheme(next);
-
-            // Defensive: keep the DOM class in sync immediately.
-            if (typeof document !== "undefined") {
-              document.documentElement.classList.toggle(
-                "dark",
-                next === "dark",
-              );
-              document.documentElement.classList.toggle(
-                "light",
-                next === "light",
-              );
-            }
           }}
           aria-label="Toggle dark mode"
           className="inline-flex h-10 items-center justify-center rounded-full border border-zinc-200 bg-white px-4 text-sm font-semibold text-foreground hover:bg-zinc-50 dark:border-moss/40 dark:bg-forest dark:text-sand dark:hover:bg-moss/20"
