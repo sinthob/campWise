@@ -40,7 +40,7 @@ export default function ListFilters(props: Props) {
   }
 
   return (
-    <div className="mb-6 rounded-2xl border border-moss/30 bg-forest p-4 shadow-md">
+    <div className="mb-6 rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-moss/30 dark:bg-forest">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <label className="flex-1">
           <span className="sr-only">Search</span>
@@ -48,7 +48,7 @@ export default function ListFilters(props: Props) {
             value={q}
             onChange={(e) => update({ q: e.target.value })}
             placeholder={props.searchPlaceholder}
-            className="h-11 w-full rounded-full border border-moss/40 bg-forest/60 px-4 text-sm text-sand outline-none ring-0 placeholder:text-sand/60 focus:border-accent focus:ring-2 focus:ring-accent/20"
+            className="h-11 w-full rounded-full border border-zinc-200 bg-white px-4 text-sm text-zinc-900 outline-none ring-0 placeholder:text-zinc-400 focus:border-accent focus:ring-2 focus:ring-accent/20 dark:border-moss/40 dark:bg-forest/60 dark:text-sand dark:placeholder:text-sand/60"
           />
         </label>
 
@@ -57,7 +57,7 @@ export default function ListFilters(props: Props) {
           <select
             value={type}
             onChange={(e) => update({ type: e.target.value })}
-            className="h-11 w-full rounded-full border border-moss/40 bg-forest/60 px-4 text-sm text-sand outline-none focus:border-accent focus:ring-2 focus:ring-accent/20"
+            className="h-11 w-full rounded-full border border-zinc-200 bg-white px-4 text-sm text-zinc-900 outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 dark:border-moss/40 dark:bg-forest/60 dark:text-sand"
           >
             <option value="">{props.typePlaceholder}</option>
             {props.typeOptions.map((opt) => (

@@ -855,8 +855,8 @@ export default async function DynamicDetailPage(props: {
         </Link>
 
         {/* 1) Hero */}
-        <section className="overflow-hidden rounded-3xl border border-moss/30 bg-forest shadow-sm">
-          <div className="relative h-[320px] w-full bg-moss sm:h-[420px]">
+        <section className="overflow-hidden rounded-3xl border border-zinc-200 bg-white shadow-sm dark:border-moss/30 dark:bg-forest">
+          <div className="relative h-[320px] w-full bg-zinc-100 sm:h-[420px] dark:bg-moss">
             {imageUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
@@ -866,12 +866,12 @@ export default async function DynamicDetailPage(props: {
                 loading="lazy"
               />
             ) : (
-              <div className="flex h-full w-full items-center justify-center text-sm text-sand/70">
+              <div className="flex h-full w-full items-center justify-center text-sm text-zinc-500 dark:text-sand/70">
                 No image
               </div>
             )}
 
-            <div className="absolute left-4 top-4 rounded-full bg-forest/80 px-3 py-1 text-xs font-semibold text-sand ring-1 ring-moss/40 backdrop-blur">
+            <div className="absolute left-4 top-4 rounded-full bg-white/85 px-3 py-1 text-xs font-semibold text-zinc-900 ring-1 ring-zinc-200/70 backdrop-blur dark:bg-forest/80 dark:text-sand dark:ring-moss/40">
               {cfg.badge}
             </div>
           </div>
@@ -886,7 +886,7 @@ export default async function DynamicDetailPage(props: {
 
         {/* 2) AI Insight */}
         {hasAnyInsight ? (
-          <section className="rounded-2xl border border-moss/30 bg-moss/10 p-6">
+          <section className="rounded-2xl border border-zinc-200 bg-zinc-50/60 p-6 dark:border-moss/30 dark:bg-moss/10">
             <h2 className="text-base font-semibold">🤖 AI Insight</h2>
 
             <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -939,18 +939,18 @@ export default async function DynamicDetailPage(props: {
 
         {/* 3) Quick Facts */}
         {quickFacts.length > 0 ? (
-          <section className="rounded-2xl border border-moss/30 bg-forest p-6 text-sand">
+          <section className="rounded-2xl border border-zinc-200 bg-white p-6 text-foreground shadow-sm dark:border-moss/30 dark:bg-forest dark:text-sand">
             <h2 className="text-base font-semibold">Quick Facts</h2>
             <dl className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
               {quickFacts.map((f) => (
                 <div
                   key={f.key}
-                  className="rounded-xl bg-forest/60 p-4 ring-1 ring-moss/30"
+                  className="rounded-xl bg-zinc-50 p-4 ring-1 ring-zinc-200 dark:bg-forest/60 dark:ring-moss/30"
                 >
-                  <dt className="text-xs font-semibold text-sand/70">
+                  <dt className="text-xs font-semibold text-zinc-600 dark:text-sand/70">
                     {f.key}
                   </dt>
-                  <dd className="mt-1 text-sm font-medium text-sand">
+                  <dd className="mt-1 text-sm font-medium text-zinc-900 dark:text-sand">
                     {f.value}
                   </dd>
                 </div>
@@ -961,7 +961,7 @@ export default async function DynamicDetailPage(props: {
 
         {/* 4) Raw review (collapsible) */}
         {rawReview ? (
-          <section className="rounded-2xl border border-moss/30 bg-forest p-6 text-sand">
+          <section className="rounded-2xl border border-zinc-200 bg-white p-6 text-foreground shadow-sm dark:border-moss/30 dark:bg-forest dark:text-sand">
             <details className="group">
               <summary className="cursor-pointer list-none text-base font-semibold">
                 📝 Raw review
@@ -969,7 +969,7 @@ export default async function DynamicDetailPage(props: {
                   (click to {"open"})
                 </span>
               </summary>
-              <p className="mt-3 whitespace-pre-line text-sm leading-7 text-sand/80">
+              <p className="mt-3 whitespace-pre-line text-sm leading-7 text-slate-700 dark:text-sand/80">
                 {rawReview}
               </p>
             </details>
