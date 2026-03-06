@@ -66,7 +66,7 @@ export default function NavBar() {
           aria-label="Toggle dark mode"
           className="inline-flex h-10 items-center justify-center rounded-full border border-zinc-200 bg-white px-4 text-sm font-semibold text-foreground hover:bg-zinc-50 dark:border-moss/40 dark:bg-forest dark:text-sand dark:hover:bg-moss/20"
         >
-          {isDark ? "Light mode" : "Dark mode"}
+          {isDark ? "Theme: Dark" : "Theme: Light"}
         </button>
       </div>
 
