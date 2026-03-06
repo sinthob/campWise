@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 function safeLocalStorageGet(key: string): string | null {
   try {
@@ -24,12 +24,8 @@ export default function HeroActions(props: {
   mapsUrl: string;
 }) {
   const saveKey = `campwise:saved:${props.recordId}:campground`;
-  const [saved, setSaved] = useState(false);
+  const [saved, setSaved] = useState(() => safeLocalStorageGet(saveKey) === "1");
   const [shared, setShared] = useState(false);
-
-  useEffect(() => {
-    setSaved(safeLocalStorageGet(saveKey) === "1");
-  }, [saveKey]);
 
   function toggleSave() {
     const next = !saved;

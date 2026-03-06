@@ -5,8 +5,14 @@ import { useTheme } from "next-themes";
 
 export default function NavBar() {
   const { resolvedTheme, theme, setTheme } = useTheme();
-  const activeTheme = resolvedTheme ?? theme;
-  const isDark = activeTheme === "dark";
+
+  // next-themes can briefly report a stale theme value during hydration.
+  // The most reliable source of truth for the currently-applied theme is
+  // whether the provider has applied the `dark` class on <html>.
+  const isDark =
+    typeof document !== "undefined"
+      ? document.documentElement.classList.contains("dark")
+      : (resolvedTheme ?? theme) === "dark";
 
   return (
     <header className="sticky top-0 z-50 border-b border-moss/30 bg-forest text-sand shadow-md">
