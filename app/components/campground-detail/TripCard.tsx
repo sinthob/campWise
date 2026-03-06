@@ -85,7 +85,9 @@ export default function TripCard(props: {
   const storageKey = `campwise:saved:${props.recordId}:${props.planKey}`;
 
   const [open, setOpen] = useState(props.defaultOpen ?? false);
-  const [saved, setSaved] = useState(() => safeLocalStorageGet(storageKey) === "1");
+  const [saved, setSaved] = useState(
+    () => safeLocalStorageGet(storageKey) === "1",
+  );
   const [copied, setCopied] = useState(false);
 
   function toggleSaved() {

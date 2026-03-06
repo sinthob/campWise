@@ -90,9 +90,7 @@ function TempBar(props: { label: string; value?: string }) {
           <div
             key={idx}
             className={`h-2 rounded-full ring-1 ring-zinc-200 dark:ring-moss/30 ${
-              idx < activeSegments
-                ? "bg-accent"
-                : "bg-zinc-100 dark:bg-moss/15"
+              idx < activeSegments ? "bg-accent" : "bg-zinc-100 dark:bg-moss/15"
             }`}
           />
         ))}

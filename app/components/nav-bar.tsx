@@ -53,8 +53,14 @@ export default function NavBar() {
 
             // Defensive: keep the DOM class in sync immediately.
             if (typeof document !== "undefined") {
-              document.documentElement.classList.toggle("dark", next === "dark");
-              document.documentElement.classList.toggle("light", next === "light");
+              document.documentElement.classList.toggle(
+                "dark",
+                next === "dark",
+              );
+              document.documentElement.classList.toggle(
+                "light",
+                next === "light",
+              );
             }
           }}
           aria-label="Toggle dark mode"

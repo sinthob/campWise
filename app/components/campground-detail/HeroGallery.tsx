@@ -19,7 +19,7 @@ export default function HeroGallery(props: {
       {images.length > 0 ? (
         <div className="space-y-4 p-4">
           <div className="relative overflow-hidden rounded-2xl bg-zinc-100 dark:bg-moss">
-            <div className="aspect-[16/10] w-full">
+            <div className="aspect-[16/7] w-full">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={images[0].url}
@@ -58,7 +58,7 @@ export default function HeroGallery(props: {
           ) : null}
         </div>
       ) : (
-        <div className="flex h-[320px] w-full items-center justify-center bg-zinc-100 text-sm text-zinc-500 dark:bg-moss dark:text-sand/70 sm:h-[420px]">
+        <div className="flex h-[160px] w-full items-center justify-center bg-zinc-100 text-sm text-zinc-500 dark:bg-moss dark:text-sand/70 sm:h-[220px]">
           No image available
         </div>
       )}

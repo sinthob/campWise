@@ -24,7 +24,9 @@ export default function HeroActions(props: {
   mapsUrl: string;
 }) {
   const saveKey = `campwise:saved:${props.recordId}:campground`;
-  const [saved, setSaved] = useState(() => safeLocalStorageGet(saveKey) === "1");
+  const [saved, setSaved] = useState(
+    () => safeLocalStorageGet(saveKey) === "1",
+  );
   const [shared, setShared] = useState(false);
 
   function toggleSave() {

@@ -430,10 +430,7 @@ function parseAiInsightJson(raw: string | undefined | null): {
 }
 
 function normalizeGearType(value: string): string {
-  return value
-    .toLowerCase()
-    .replace(/\s+/g, " ")
-    .trim();
+  return value.toLowerCase().replace(/\s+/g, " ").trim();
 }
 
 export default async function DynamicDetailPage(props: {
@@ -657,7 +654,9 @@ export default async function DynamicDetailPage(props: {
       record.fields["Recommended Gear"] ??
       record.fields["Recommended Gear Types"] ??
       record.fields["Recommended Gear Type"];
-    const recommendedGearTypes = toStringListFromUnknown(recommendedGearTypesRaw)
+    const recommendedGearTypes = toStringListFromUnknown(
+      recommendedGearTypesRaw,
+    )
       .map((t) => t.trim())
       .filter(Boolean);
 
@@ -696,7 +695,9 @@ export default async function DynamicDetailPage(props: {
         const matches =
           recommendedTypeSet.size === 0
             ? false
-            : gearTypeTokens.some((t) => recommendedTypeSet.has(normalizeGearType(t))) ||
+            : gearTypeTokens.some((t) =>
+                recommendedTypeSet.has(normalizeGearType(t)),
+              ) ||
               (gearTypeLabel
                 ? recommendedTypeSet.has(normalizeGearType(gearTypeLabel))
                 : false);

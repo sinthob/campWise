@@ -24,7 +24,9 @@ export default function MobileStickyCTA(props: {
   mapsUrl: string;
 }) {
   const storageKey = `campwise:saved:${props.recordId}:campground`;
-  const [saved, setSaved] = useState(() => safeLocalStorageGet(storageKey) === "1");
+  const [saved, setSaved] = useState(
+    () => safeLocalStorageGet(storageKey) === "1",
+  );
   const [shared, setShared] = useState(false);
 
   function toggleSaved() {
