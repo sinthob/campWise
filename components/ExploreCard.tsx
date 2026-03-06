@@ -16,11 +16,11 @@ export default function ExploreCard(props: ExploreCardProps) {
   return (
     <Link
       href={href}
-      className="group block overflow-hidden rounded-2xl border border-moss/30 bg-forest text-sand shadow-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-xl"
+      className="group block overflow-hidden rounded-2xl border border-zinc-200 bg-white text-slate-900 shadow-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-md dark:border-moss/30 dark:bg-forest dark:text-sand dark:hover:shadow-xl"
       aria-label={`${props.badge}: ${props.title}`}
     >
-      <div className="relative w-full bg-moss">
-        <div className="absolute left-3 top-3 z-10 rounded-full bg-forest/80 px-3 py-1 text-xs font-semibold text-sand ring-1 ring-moss/40 backdrop-blur">
+      <div className="relative w-full bg-zinc-100 dark:bg-moss">
+        <div className="absolute left-3 top-3 z-10 rounded-full bg-white/85 px-3 py-1 text-xs font-semibold text-slate-800 ring-1 ring-zinc-200/70 backdrop-blur dark:bg-forest/80 dark:text-sand dark:ring-moss/40">
           {props.badge}
         </div>
 
@@ -34,7 +34,7 @@ export default function ExploreCard(props: ExploreCardProps) {
               loading="lazy"
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center text-sm text-sand/70">
+            <div className="flex h-full w-full items-center justify-center text-sm text-slate-500 dark:text-sand/70">
               No image
             </div>
           )}
@@ -46,16 +46,18 @@ export default function ExploreCard(props: ExploreCardProps) {
           {props.title}
         </h3>
         {props.subtitle ? (
-          <p className="mt-1 text-sm text-sand/70">{props.subtitle}</p>
+          <p className="mt-1 text-sm text-slate-600 dark:text-sand/70">
+            {props.subtitle}
+          </p>
         ) : null}
 
         {props.summary ? (
-          <p className="mt-3 line-clamp-3 text-sm leading-6 text-sand/80">
+          <p className="mt-3 line-clamp-3 text-sm leading-6 text-slate-600 dark:text-sand/80">
             {props.summary}
           </p>
         ) : null}
 
-        <div className="mt-4 text-sm font-medium text-accent">
+        <div className="mt-4 text-sm font-medium text-primary dark:text-accent">
           ดูรายละเอียดเพิ่มเติม →
         </div>
       </div>
