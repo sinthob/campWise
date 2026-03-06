@@ -109,17 +109,19 @@ export default function TripCard(props: {
   const collapsible = props.collapsibleOnMobile ?? true;
 
   return (
-    <section className="rounded-3xl border border-moss/30 bg-forest p-5 text-sand shadow-sm">
+    <section className="rounded-3xl border border-zinc-200 bg-white p-5 text-foreground shadow-sm dark:border-moss/30 dark:bg-forest dark:text-sand">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <h3 className="text-base font-semibold sm:text-lg">{props.title}</h3>
-          <p className="mt-1 text-sm leading-6 text-sand/70">{props.intro}</p>
+          <p className="mt-1 text-sm leading-6 text-slate-600 dark:text-sand/70">
+            {props.intro}
+          </p>
         </div>
 
         {collapsible ? (
           <button
             type="button"
-            className="inline-flex shrink-0 items-center justify-center rounded-full border border-moss/30 bg-forest/60 px-3 py-2 text-sm font-medium text-sand hover:bg-forest focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent md:hidden"
+            className="inline-flex shrink-0 items-center justify-center rounded-full border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-foreground hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent md:hidden dark:border-moss/30 dark:bg-forest/60 dark:text-sand dark:hover:bg-forest"
             aria-expanded={open}
             aria-controls={contentId}
             onClick={() => setOpen((v) => !v)}
@@ -138,23 +140,23 @@ export default function TripCard(props: {
             timeline.map((item, idx) => (
               <li
                 key={`${idx}-${item.time ?? ""}-${item.activity}`}
-                className="grid grid-cols-[28px_90px_1fr] gap-3 rounded-2xl bg-forest/60 p-3 ring-1 ring-moss/30"
+                className="grid grid-cols-[28px_90px_1fr] gap-3 rounded-2xl bg-zinc-50 p-3 ring-1 ring-zinc-200 dark:bg-forest/60 dark:ring-moss/30"
               >
-                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-moss/20 text-sand/80">
+                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-foreground/80 dark:bg-moss/20 dark:text-sand/80">
                   <span aria-hidden="true">•</span>
                 </div>
 
-                <div className="text-xs font-semibold uppercase tracking-wide text-sand/70">
+                <div className="text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-sand/70">
                   {item.time ?? ""}
                 </div>
 
-                <div className="text-sm leading-[1.7] text-sand/85">
+                <div className="text-sm leading-[1.7] text-slate-700 dark:text-sand/85">
                   {item.activity}
                 </div>
               </li>
             ))
           ) : (
-            <li className="rounded-2xl bg-forest/60 p-4 text-sm text-sand/70 ring-1 ring-moss/30">
+            <li className="rounded-2xl bg-zinc-50 p-4 text-sm text-slate-600 ring-1 ring-zinc-200 dark:bg-forest/60 dark:text-sand/70 dark:ring-moss/30">
               ยังไม่มีข้อมูลใน Airtable
             </li>
           )}
@@ -164,7 +166,7 @@ export default function TripCard(props: {
           <button
             type="button"
             onClick={copyPlan}
-            className="inline-flex items-center justify-center rounded-full bg-forest px-4 py-2 text-sm font-medium text-sand ring-1 ring-moss/30 hover:bg-forest/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="inline-flex items-center justify-center rounded-full border border-zinc-200 bg-white px-4 py-2 text-sm font-medium text-foreground hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent dark:border-transparent dark:bg-forest dark:text-sand dark:ring-1 dark:ring-moss/30 dark:hover:bg-forest/80"
           >
             {copied ? "Copied" : "Copy Plan"}
           </button>
