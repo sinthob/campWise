@@ -24,8 +24,15 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const buildId =
+    (process.env.VERCEL_GIT_COMMIT_SHA ||
+      process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA ||
+      "dev")
+      .toString()
+      .slice(0, 7);
+
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning data-build={buildId}>
       <body
         className={`${displayFont.variable} ${geistMono.variable} min-h-screen bg-background text-foreground antialiased`}
       >

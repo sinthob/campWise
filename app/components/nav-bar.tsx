@@ -21,12 +21,21 @@ export default function NavBar() {
     if (typeof document === "undefined") return;
 
     const root = document.documentElement;
+    const body = document.body;
 
     // Tailwind dark mode is driven by `.dark` on an ancestor.
     root.classList.toggle("dark", currentTheme === "dark");
 
     // Defensive cleanup: avoid any stray `light` class affecting styling.
     root.classList.remove("light");
+
+    // Extra defensive cleanup: if any past code left theme classes on <body>,
+    // it can incorrectly keep `dark:` styles active even when <html> is light.
+    body.classList.remove("dark");
+    body.classList.remove("light");
+
+    // Debug aid (inspect in Elements): <html data-theme="...">.
+    root.dataset.theme = currentTheme;
   }, [currentTheme]);
 
   const isDark = currentTheme === "dark";
