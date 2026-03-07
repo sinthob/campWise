@@ -2,43 +2,18 @@
 
 import Link from "next/link";
 import { useTheme } from "next-themes";
-import { useEffect } from "react";
 
 export default function NavBar() {
   const { theme, resolvedTheme, setTheme } = useTheme();
 
-  const currentTheme: "light" | "dark" =
+  const effectiveTheme: "light" | "dark" =
     resolvedTheme === "light" || resolvedTheme === "dark"
       ? resolvedTheme
       : theme === "light" || theme === "dark"
         ? theme
-        : typeof document !== "undefined" &&
-            document.documentElement.classList.contains("dark")
-          ? "dark"
-          : "light";
+        : "light";
 
-  useEffect(() => {
-    if (typeof document === "undefined") return;
-
-    const root = document.documentElement;
-    const body = document.body;
-
-    // Tailwind dark mode is driven by `.dark` on an ancestor.
-    root.classList.toggle("dark", currentTheme === "dark");
-
-    // Defensive cleanup: avoid any stray `light` class affecting styling.
-    root.classList.remove("light");
-
-    // Extra defensive cleanup: if any past code left theme classes on <body>,
-    // it can incorrectly keep `dark:` styles active even when <html> is light.
-    body.classList.remove("dark");
-    body.classList.remove("light");
-
-    // Debug aid (inspect in Elements): <html data-theme="...">.
-    root.dataset.theme = currentTheme;
-  }, [currentTheme]);
-
-  const isDark = currentTheme === "dark";
+  const isDark = effectiveTheme === "dark";
 
   return (
     <header className="sticky top-0 z-50 border-b border-zinc-200 bg-white text-foreground shadow-sm dark:border-moss/30 dark:bg-forest dark:text-sand">
@@ -71,7 +46,7 @@ export default function NavBar() {
         <button
           type="button"
           onClick={() => {
-            const next = currentTheme === "dark" ? "light" : "dark";
+            const next = isDark ? "light" : "dark";
             setTheme(next);
           }}
           aria-label="Toggle dark mode"
