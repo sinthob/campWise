@@ -720,7 +720,7 @@ export default async function DynamicDetailPage(props: {
     }>;
 
     return (
-      <div className="min-h-screen bg-white px-4 py-8 text-foreground dark:bg-forest dark:text-sand">
+      <div className="min-h-screen bg-white px-4 py-8 text-foreground outline outline-1 outline-white dark:bg-forest dark:text-sand dark:outline-0">
         <div className="mx-auto w-full max-w-6xl space-y-8 pb-24 md:pb-10">
           <nav aria-label="Breadcrumb">
             <Link
