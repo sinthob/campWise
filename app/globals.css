@@ -8,7 +8,7 @@
 
   /* Use a true white canvas in light mode (matches the card-based UI). */
   --background: #ffffff;
-  --foreground: #ffffff;
+  --foreground: #0f172a;
   --primary: var(--moss);
   color-scheme: light;
 }
