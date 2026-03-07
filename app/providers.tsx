@@ -1,7 +1,6 @@
 "use client";
 
 import { ThemeProvider } from "next-themes";
-import ThemeBodyClassCleanup from "@/app/components/theme-body-class-cleanup";
 
 export function Providers(props: { children: React.ReactNode }) {
   return (
@@ -11,7 +10,6 @@ export function Providers(props: { children: React.ReactNode }) {
       enableSystem={false}
       storageKey="campwise-theme"
     >
-      <ThemeBodyClassCleanup />
       {props.children}
     </ThemeProvider>
   );

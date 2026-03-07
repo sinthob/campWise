@@ -25,14 +25,7 @@
   --font-mono: var(--font-geist-mono);
 }
 
-/*
-  Dark mode tokens.
-  Tailwind's `dark:` variant activates when any ancestor has class `dark`.
-  next-themes typically toggles it on <html>, but historically it can end up
-  on <body> (or be left there by older code). Target both to avoid mismatches
-  where dark backgrounds render with light foreground tokens.
-*/
-:where(html.dark, body.dark) {
+html.dark {
   --background: #081c15;
   --foreground: var(--sand);
   --primary: var(--moss);
