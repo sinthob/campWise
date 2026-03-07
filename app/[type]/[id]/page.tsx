@@ -17,6 +17,7 @@ import BestSeason from "@/app/components/campground-detail/BestSeason";
 import GearSuggestion from "@/app/components/campground-detail/GearSuggestion";
 import RecommendedGearCards from "@/app/components/campground-detail/RecommendedGearCards";
 import MobileStickyCTA from "@/app/components/campground-detail/MobileStickyCTA";
+import GearDetailActions from "@/app/components/gear-detail-actions";
 
 export const dynamic = "force-dynamic";
 
@@ -844,9 +845,59 @@ export default async function DynamicDetailPage(props: {
 
   const quickFacts = getQuickFacts(record.fields, cfg.quickFactsExclude);
 
+  const weightText =
+    pickString(record.fields, [
+      "Weight",
+      "Total Weight",
+      "Pack Weight",
+      "Base Weight",
+      "Gear Weight",
+    ]) ||
+    toShortStringFromUnknown(
+      record.fields["Weight"] ??
+        record.fields["Total Weight"] ??
+        record.fields["Pack Weight"] ??
+        record.fields["Base Weight"] ??
+        record.fields["Gear Weight"],
+    );
+
+  const seasonText =
+    pickString(record.fields, [
+      "Season",
+      "Best Season",
+      "Best season",
+      "Season rating",
+      "Season Rating",
+    ]) ||
+    toShortStringFromUnknown(
+      record.fields["Season"] ??
+        record.fields["Best Season"] ??
+        record.fields["Best season"] ??
+        record.fields["Season rating"] ??
+        record.fields["Season Rating"],
+    );
+
+  const usageTypeText =
+    pickString(record.fields, [
+      "Usage type",
+      "Usage Type",
+      "Use case",
+      "Use Case",
+      "Usage",
+      "Ideal for",
+    ]) ||
+    toShortStringFromUnknown(
+      record.fields["Usage type"] ??
+        record.fields["Usage Type"] ??
+        record.fields["Use case"] ??
+        record.fields["Use Case"] ??
+        record.fields["Usage"] ??
+        record.fields["Ideal for"],
+    );
+
   return (
     <div className="min-h-screen bg-background px-4 py-10 text-foreground">
-      <div className="mx-auto w-full max-w-4xl space-y-8">
+      <div className="mx-auto w-full max-w-5xl space-y-8">
         <Link
           href={cfg.listHref}
           className="text-sm font-medium text-foreground/80 hover:text-accent"
@@ -855,107 +906,158 @@ export default async function DynamicDetailPage(props: {
         </Link>
 
         {/* 1) Hero */}
-        <section className="overflow-hidden rounded-3xl border border-zinc-200 bg-white shadow-sm dark:border-moss/30 dark:bg-forest">
-          <div className="relative h-[320px] w-full bg-zinc-100 sm:h-[420px] dark:bg-moss">
-            {imageUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={imageUrl}
-                alt={title}
-                className="h-full w-full object-cover"
-                loading="lazy"
-              />
-            ) : (
-              <div className="flex h-full w-full items-center justify-center text-sm text-zinc-500 dark:text-sand/70">
-                No image
+        <section className="rounded-3xl border border-zinc-200 bg-white shadow-sm dark:border-moss/30 dark:bg-forest">
+          <div className="grid grid-cols-1 gap-6 p-5 sm:p-6 md:grid-cols-2">
+            <div className="overflow-hidden rounded-2xl bg-zinc-100 ring-1 ring-zinc-200 dark:bg-moss dark:ring-moss/40">
+              <div className="aspect-[4/3] w-full">
+                {imageUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={imageUrl}
+                    alt={title}
+                    className="h-full w-full object-cover"
+                    loading="lazy"
+                  />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center text-sm text-zinc-500 dark:text-sand/70">
+                    No image
+                  </div>
+                )}
               </div>
-            )}
+            </div>
 
-            <div className="absolute left-4 top-4 rounded-full bg-white/85 px-3 py-1 text-xs font-semibold text-zinc-900 ring-1 ring-zinc-200/70 backdrop-blur dark:bg-forest/80 dark:text-sand dark:ring-moss/40">
-              {cfg.badge}
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="inline-flex items-center rounded-full bg-zinc-100 px-3 py-1 text-xs font-semibold text-zinc-900 dark:bg-moss/40 dark:text-sand">
+                  {cfg.badge}
+                </span>
+
+                {location ? (
+                  <span className="inline-flex items-center rounded-full border border-zinc-200 bg-white px-3 py-1 text-xs font-semibold text-foreground/80 dark:border-moss/30 dark:bg-forest dark:text-sand/80">
+                    {location}
+                  </span>
+                ) : null}
+              </div>
+
+              <h1 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
+                {title}
+              </h1>
+
+              <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
+                {weightText ? (
+                  <div className="rounded-2xl bg-white p-4 ring-1 ring-zinc-200/80 shadow-sm dark:bg-forest/60 dark:ring-moss/30">
+                    <div className="text-xs font-semibold text-foreground/70">
+                      Weight
+                    </div>
+                    <div className="mt-1 text-sm font-semibold text-foreground">
+                      {weightText}
+                    </div>
+                  </div>
+                ) : null}
+
+                {seasonText ? (
+                  <div className="rounded-2xl bg-white p-4 ring-1 ring-zinc-200/80 shadow-sm dark:bg-forest/60 dark:ring-moss/30">
+                    <div className="text-xs font-semibold text-foreground/70">
+                      Season
+                    </div>
+                    <div className="mt-1 text-sm font-semibold text-foreground">
+                      {seasonText}
+                    </div>
+                  </div>
+                ) : null}
+
+                {usageTypeText ? (
+                  <div className="rounded-2xl bg-white p-4 ring-1 ring-zinc-200/80 shadow-sm dark:bg-forest/60 dark:ring-moss/30">
+                    <div className="text-xs font-semibold text-foreground/70">
+                      Usage
+                    </div>
+                    <div className="mt-1 text-sm font-semibold text-foreground">
+                      {usageTypeText}
+                    </div>
+                  </div>
+                ) : null}
+              </div>
+
+              {type === "gear" ? (
+                <GearDetailActions recordId={id} title={title} />
+              ) : null}
             </div>
           </div>
         </section>
 
-        <header>
-          <h1 className="text-3xl font-bold tracking-tight">{title}</h1>
-          {location ? (
-            <p className="mt-2 text-sm text-foreground/70">{location}</p>
-          ) : null}
-        </header>
+        {/* 2) Quick Facts + AI Insight (top of page) */}
+        {quickFacts.length > 0 || hasAnyInsight ? (
+          <section className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+            {quickFacts.length > 0 ? (
+              <div className="rounded-3xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-moss/30 dark:bg-forest lg:col-span-2">
+                <header className="flex items-center justify-between gap-3">
+                  <h2 className="text-base font-semibold">Quick Facts</h2>
+                  <p className="text-xs text-foreground/60">
+                    Fast scan • {quickFacts.length} items
+                  </p>
+                </header>
 
-        {/* 2) AI Insight */}
-        {hasAnyInsight ? (
-          <section className="rounded-2xl border border-zinc-200 bg-zinc-50/60 p-6 dark:border-moss/30 dark:bg-moss/10">
-            <h2 className="text-base font-semibold">🤖 AI Insight</h2>
+                <dl className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+                  {quickFacts.map((f) => (
+                    <div
+                      key={f.key}
+                      className="rounded-2xl bg-white p-4 ring-1 ring-zinc-200/80 shadow-sm dark:bg-forest/60 dark:ring-moss/30"
+                    >
+                      <dt className="text-[11px] font-semibold uppercase tracking-wide text-foreground/60">
+                        {f.key}
+                      </dt>
+                      <dd className="mt-1 text-sm font-semibold text-foreground">
+                        {f.value}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+            ) : null}
 
-            <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-              {strengthsList.length > 0 ? (
-                <div>
-                  <h3 className="text-sm font-semibold">Strengths</h3>
-                  <ul className="mt-2 list-disc space-y-1 pl-5 text-sm leading-6 text-foreground/80">
-                    {strengthsList.map((item, idx) => (
-                      <li key={`${idx}-${item}`}>{item}</li>
-                    ))}
-                  </ul>
+            {hasAnyInsight ? (
+              <div className="rounded-3xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-moss/30 dark:bg-forest">
+                <h2 className="text-base font-semibold">🤖 AI Insight</h2>
+                <p className="mt-1 text-xs leading-5 text-foreground/60">
+                  Key takeaways for quick decisions.
+                </p>
+
+                <div className="mt-4 space-y-4">
+                  {bestForList.length > 0 ? (
+                    <div>
+                      <h3 className="text-sm font-semibold">Best use cases</h3>
+                      <ul className="mt-2 list-disc space-y-1 pl-5 text-sm leading-6 text-foreground/80">
+                        {bestForList.slice(0, 4).map((item, idx) => (
+                          <li key={`${idx}-${item}`}>{item}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  ) : null}
+
+                  {strengthsList.length > 0 ? (
+                    <div>
+                      <h3 className="text-sm font-semibold">Key advantages</h3>
+                      <ul className="mt-2 list-disc space-y-1 pl-5 text-sm leading-6 text-foreground/80">
+                        {strengthsList.slice(0, 4).map((item, idx) => (
+                          <li key={`${idx}-${item}`}>{item}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  ) : null}
+
+                  {tipsList.length > 0 ? (
+                    <div>
+                      <h3 className="text-sm font-semibold">When to use</h3>
+                      <ul className="mt-2 list-disc space-y-1 pl-5 text-sm leading-6 text-foreground/80">
+                        {tipsList.slice(0, 4).map((item, idx) => (
+                          <li key={`${idx}-${item}`}>{item}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  ) : null}
                 </div>
-              ) : null}
-
-              {weaknessesList.length > 0 ? (
-                <div>
-                  <h3 className="text-sm font-semibold">Weaknesses</h3>
-                  <ul className="mt-2 list-disc space-y-1 pl-5 text-sm leading-6 text-foreground/80">
-                    {weaknessesList.map((item, idx) => (
-                      <li key={`${idx}-${item}`}>{item}</li>
-                    ))}
-                  </ul>
-                </div>
-              ) : null}
-
-              {bestForList.length > 0 ? (
-                <div>
-                  <h3 className="text-sm font-semibold">Best for</h3>
-                  <ul className="mt-2 list-disc space-y-1 pl-5 text-sm leading-6 text-foreground/80">
-                    {bestForList.map((item, idx) => (
-                      <li key={`${idx}-${item}`}>{item}</li>
-                    ))}
-                  </ul>
-                </div>
-              ) : null}
-
-              {tipsList.length > 0 ? (
-                <div>
-                  <h3 className="text-sm font-semibold">Tips</h3>
-                  <ul className="mt-2 list-disc space-y-1 pl-5 text-sm leading-6 text-foreground/80">
-                    {tipsList.map((item, idx) => (
-                      <li key={`${idx}-${item}`}>{item}</li>
-                    ))}
-                  </ul>
-                </div>
-              ) : null}
-            </div>
-          </section>
-        ) : null}
-
-        {/* 3) Quick Facts */}
-        {quickFacts.length > 0 ? (
-          <section className="rounded-2xl border border-zinc-200 bg-white p-6 text-foreground shadow-sm dark:border-moss/30 dark:bg-forest dark:text-sand">
-            <h2 className="text-base font-semibold">Quick Facts</h2>
-            <dl className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-              {quickFacts.map((f) => (
-                <div
-                  key={f.key}
-                  className="rounded-xl bg-zinc-50 p-4 ring-1 ring-zinc-200 dark:bg-forest/60 dark:ring-moss/30"
-                >
-                  <dt className="text-xs font-semibold text-zinc-600 dark:text-sand/70">
-                    {f.key}
-                  </dt>
-                  <dd className="mt-1 text-sm font-medium text-zinc-900 dark:text-sand">
-                    {f.value}
-                  </dd>
-                </div>
-              ))}
-            </dl>
+              </div>
+            ) : null}
           </section>
         ) : null}
 
