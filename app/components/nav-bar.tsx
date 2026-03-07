@@ -11,7 +11,10 @@ export default function NavBar() {
       ? resolvedTheme
       : theme === "light" || theme === "dark"
         ? theme
-        : "light";
+        : typeof document !== "undefined" &&
+            document.documentElement.classList.contains("dark")
+          ? "dark"
+          : "light";
 
   const isDark = currentTheme === "dark";
 
@@ -46,7 +49,20 @@ export default function NavBar() {
         <button
           type="button"
           onClick={() => {
-            const next = currentTheme === "dark" ? "light" : "dark";
+            const domTheme: "light" | "dark" =
+              typeof document !== "undefined" &&
+              document.documentElement.classList.contains("dark")
+                ? "dark"
+                : "light";
+
+            const effectiveTheme: "light" | "dark" =
+              resolvedTheme === "light" || resolvedTheme === "dark"
+                ? resolvedTheme
+                : theme === "light" || theme === "dark"
+                  ? theme
+                  : domTheme;
+
+            const next = effectiveTheme === "dark" ? "light" : "dark";
             setTheme(next);
           }}
           aria-label="Toggle dark mode"
