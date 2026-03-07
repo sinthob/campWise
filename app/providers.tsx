@@ -7,7 +7,6 @@ export function Providers(props: { children: React.ReactNode }) {
   return (
     <ThemeProvider
       attribute="class"
-      value={{ light: "", dark: "dark" }}
       defaultTheme="light"
       enableSystem={false}
       storageKey="campwise-theme"
