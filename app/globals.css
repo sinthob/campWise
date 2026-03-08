@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   --forest: #1b4332;
   --moss: #2d6a4f;
@@ -8,7 +10,7 @@
 
   /* Use a true white canvas in light mode (matches the card-based UI). */
   --background: #ffffff;
-  --foreground: #0f172a;
+  --foreground: var(--forest);
   --primary: var(--moss);
   color-scheme: light;
 }
