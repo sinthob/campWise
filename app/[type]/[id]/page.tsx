@@ -961,40 +961,34 @@ export default async function DynamicDetailPage(props: {
                 {title}
               </h1>
 
-              {/* Gear-only: immediate context (what / who / when) */}
-              {isGear && heroDescriptionText ? (
-                <p className="mt-2 text-sm leading-6 text-foreground/70">
-                  {heroDescriptionText}
-                </p>
-              ) : null}
-
-              {isGear && bestForList.length > 0 ? (
-                <div className="mt-4">
+              {/* Gear-only: immediate context (what / who / when) as bullet points */}
+              {isGear &&
+              (heroDescriptionText ||
+                bestForList.length > 0 ||
+                strengthsList.length > 0) ? (
+                <div className="mt-3 rounded-2xl bg-white p-4 ring-1 ring-zinc-200/80 shadow-sm dark:bg-forest/60 dark:ring-moss/30">
                   <div className="text-xs font-semibold text-foreground/60">
-                    Best for
+                    Quick overview
                   </div>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {bestForList.slice(0, 6).map((item, idx) => (
-                      <span
-                        key={`${idx}-${item}`}
-                        className="inline-flex items-center rounded-full border border-zinc-200 bg-white px-3 py-1 text-xs font-semibold text-foreground/80 dark:border-moss/30 dark:bg-forest/60 dark:text-sand/80"
-                      >
-                        {item}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              ) : null}
 
-              {isGear && strengthsList.length > 0 ? (
-                <div className="mt-4">
-                  <div className="text-xs font-semibold text-foreground/60">
-                    Highlights
-                  </div>
                   <ul className="mt-2 list-disc space-y-1 pl-5 text-sm leading-6 text-foreground/80">
-                    {strengthsList.slice(0, 3).map((item, idx) => (
-                      <li key={`${idx}-${item}`}>{item}</li>
-                    ))}
+                    {heroDescriptionText ? (
+                      <li>{heroDescriptionText}</li>
+                    ) : null}
+
+                    {bestForList.length > 0 ? (
+                      <li>
+                        <span className="font-semibold">Best for:</span>{" "}
+                        {bestForList.slice(0, 5).join(", ")}
+                      </li>
+                    ) : null}
+
+                    {strengthsList.length > 0 ? (
+                      <li>
+                        <span className="font-semibold">Highlights:</span>{" "}
+                        {strengthsList.slice(0, 4).join(", ")}
+                      </li>
+                    ) : null}
                   </ul>
                 </div>
               ) : null}
@@ -1033,12 +1027,6 @@ export default async function DynamicDetailPage(props: {
                   </div>
                 ) : null}
               </div>
-
-              {isGear ? (
-                <div className="mt-5">
-                  <GearDetailActions recordId={id} title={title} />
-                </div>
-              ) : null}
             </div>
           </div>
         </section>
