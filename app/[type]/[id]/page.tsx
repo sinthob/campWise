@@ -895,6 +895,8 @@ export default async function DynamicDetailPage(props: {
         record.fields["Ideal for"],
     );
 
+  const isGear = type === "gear";
+
   return (
     <div className="min-h-screen bg-background px-4 py-10 text-foreground">
       <div className="mx-auto w-full max-w-5xl space-y-8">
@@ -977,19 +979,90 @@ export default async function DynamicDetailPage(props: {
                   </div>
                 ) : null}
               </div>
-
-              {type === "gear" ? (
-                <GearDetailActions recordId={id} title={title} />
-              ) : null}
             </div>
           </div>
         </section>
 
-        {/* 2) Quick Facts + AI Insight (top of page) */}
+        {/* 2) Use Cases (gear) */}
+        {isGear && bestForList.length > 0 ? (
+          <section className="rounded-3xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-moss/30 dark:bg-forest">
+            <header className="space-y-1">
+              <h2 className="text-base font-semibold">Use Cases</h2>
+              <p className="text-xs leading-5 text-foreground/60">
+                Quick ideas for when this gear shines.
+              </p>
+            </header>
+
+            <div className="mt-4 flex flex-wrap gap-2">
+              {bestForList.slice(0, 10).map((item, idx) => (
+                <span
+                  key={`${idx}-${item}`}
+                  className="inline-flex items-center rounded-full border border-zinc-200 bg-white px-3 py-1 text-xs font-semibold text-foreground/80 dark:border-moss/30 dark:bg-forest/60 dark:text-sand/80"
+                >
+                  {item}
+                </span>
+              ))}
+            </div>
+          </section>
+        ) : null}
+
+        {/* 3) Pros / Cons (gear) */}
+        {isGear && (strengthsList.length > 0 || weaknessesList.length > 0) ? (
+          <section className="rounded-3xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-moss/30 dark:bg-forest">
+            <header className="space-y-1">
+              <h2 className="text-base font-semibold">Pros and Cons</h2>
+              <p className="text-xs leading-5 text-foreground/60">
+                A balanced view at a glance.
+              </p>
+            </header>
+
+            <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div className="rounded-2xl bg-white p-4 ring-1 ring-zinc-200/80 shadow-sm dark:bg-forest/60 dark:ring-moss/30">
+                <h3 className="text-sm font-semibold">Pros</h3>
+                {strengthsList.length > 0 ? (
+                  <ul className="mt-3 space-y-2 text-sm leading-6 text-foreground/80">
+                    {strengthsList.slice(0, 8).map((item, idx) => (
+                      <li key={`${idx}-${item}`} className="flex gap-2">
+                        <span className="mt-[2px] text-accent">✔</span>
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="mt-3 text-sm text-foreground/60">
+                    No pros listed.
+                  </p>
+                )}
+              </div>
+
+              <div className="rounded-2xl bg-white p-4 ring-1 ring-zinc-200/80 shadow-sm dark:bg-forest/60 dark:ring-moss/30">
+                <h3 className="text-sm font-semibold">Cons</h3>
+                {weaknessesList.length > 0 ? (
+                  <ul className="mt-3 space-y-2 text-sm leading-6 text-foreground/80">
+                    {weaknessesList.slice(0, 8).map((item, idx) => (
+                      <li key={`${idx}-${item}`} className="flex gap-2">
+                        <span className="mt-[2px] text-foreground/60">
+                          ✖
+                        </span>
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="mt-3 text-sm text-foreground/60">
+                    No cons listed.
+                  </p>
+                )}
+              </div>
+            </div>
+          </section>
+        ) : null}
+
+        {/* 4) Quick Facts | AI Insight (responsive 2-col) */}
         {quickFacts.length > 0 || hasAnyInsight ? (
-          <section className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          <section className="grid grid-cols-1 gap-6 md:grid-cols-2">
             {quickFacts.length > 0 ? (
-              <div className="rounded-3xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-moss/30 dark:bg-forest lg:col-span-2">
+              <div className="rounded-3xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-moss/30 dark:bg-forest">
                 <header className="flex items-center justify-between gap-3">
                   <h2 className="text-base font-semibold">Quick Facts</h2>
                   <p className="text-xs text-foreground/60">
@@ -997,7 +1070,7 @@ export default async function DynamicDetailPage(props: {
                   </p>
                 </header>
 
-                <dl className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+                <dl className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
                   {quickFacts.map((f) => (
                     <div
                       key={f.key}
@@ -1023,36 +1096,28 @@ export default async function DynamicDetailPage(props: {
                 </p>
 
                 <div className="mt-4 space-y-4">
-                  {bestForList.length > 0 ? (
+                  {!aiSummaryLooksJson && fallbackAiSummary ? (
                     <div>
-                      <h3 className="text-sm font-semibold">Best use cases</h3>
+                      <h3 className="text-sm font-semibold">Summary</h3>
+                      <p className="mt-2 whitespace-pre-line text-sm leading-6 text-foreground/80">
+                        {fallbackAiSummary}
+                      </p>
+                    </div>
+                  ) : strengthsList.length > 0 ? (
+                    <div>
+                      <h3 className="text-sm font-semibold">Highlights</h3>
                       <ul className="mt-2 list-disc space-y-1 pl-5 text-sm leading-6 text-foreground/80">
-                        {bestForList.slice(0, 4).map((item, idx) => (
+                        {strengthsList.slice(0, 5).map((item, idx) => (
                           <li key={`${idx}-${item}`}>{item}</li>
                         ))}
                       </ul>
                     </div>
-                  ) : null}
-
-                  {strengthsList.length > 0 ? (
+                  ) : tipsList.length > 0 ? (
                     <div>
-                      <h3 className="text-sm font-semibold">Key advantages</h3>
-                      <ul className="mt-2 list-disc space-y-1 pl-5 text-sm leading-6 text-foreground/80">
-                        {strengthsList.slice(0, 4).map((item, idx) => (
-                          <li key={`${idx}-${item}`}>{item}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  ) : null}
-
-                  {tipsList.length > 0 ? (
-                    <div>
-                      <h3 className="text-sm font-semibold">When to use</h3>
-                      <ul className="mt-2 list-disc space-y-1 pl-5 text-sm leading-6 text-foreground/80">
-                        {tipsList.slice(0, 4).map((item, idx) => (
-                          <li key={`${idx}-${item}`}>{item}</li>
-                        ))}
-                      </ul>
+                      <h3 className="text-sm font-semibold">Notes</h3>
+                      <p className="mt-2 text-sm leading-6 text-foreground/80">
+                        Tips are available below.
+                      </p>
                     </div>
                   ) : null}
                 </div>
@@ -1061,8 +1126,39 @@ export default async function DynamicDetailPage(props: {
           </section>
         ) : null}
 
-        {/* 4) Raw review (collapsible) */}
-        {rawReview ? (
+        {/* 5) Tips (gear) */}
+        {isGear && tipsList.length > 0 ? (
+          <section className="rounded-3xl border border-zinc-200 bg-zinc-50 p-5 shadow-sm dark:border-moss/30 dark:bg-forest/60">
+            <header className="space-y-1">
+              <h2 className="text-base font-semibold">Camping Tips</h2>
+              <p className="text-xs leading-5 text-foreground/60">
+                Helpful reminders to get the most out of your setup.
+              </p>
+            </header>
+
+            <ul className="mt-4 list-disc space-y-1 pl-5 text-sm leading-6 text-foreground/80">
+              {tipsList.slice(0, 10).map((item, idx) => (
+                <li key={`${idx}-${item}`}>{item}</li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
+
+        {/* 6) Affiliate CTA (gear) */}
+        {isGear ? (
+          <section className="rounded-3xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-moss/30 dark:bg-forest">
+            <h2 className="text-base font-semibold">Affiliate</h2>
+            <p className="mt-1 text-xs leading-5 text-foreground/60">
+              Optional links to buy or compare pricing.
+            </p>
+            <div className="mt-4">
+              <GearDetailActions recordId={id} title={title} />
+            </div>
+          </section>
+        ) : null}
+
+        {/* Raw review (hide on gear to match requested structure) */}
+        {!isGear && rawReview ? (
           <section className="rounded-2xl border border-zinc-200 bg-white p-6 text-foreground shadow-sm dark:border-moss/30 dark:bg-forest dark:text-sand">
             <details className="group">
               <summary className="cursor-pointer list-none text-base font-semibold">
