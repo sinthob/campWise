@@ -430,6 +430,219 @@ function parseAiInsightJson(raw: string | undefined | null): {
   }
 }
 
+type HackGuideStep = {
+  title: string;
+  body?: string;
+};
+
+function toExcerpt(raw: string, maxChars: number): string {
+  const s = raw.replace(/\s+/g, " ").trim();
+  if (!s) return "";
+  if (s.length <= maxChars) return s;
+  return `${s.slice(0, Math.max(0, maxChars - 1)).trimEnd()}…`;
+}
+
+function splitParagraphs(raw: string): string[] {
+  const normalized = raw.replace(/\r/g, "").trim();
+  if (!normalized) return [];
+  return normalized
+    .split(/\n{2,}/g)
+    .map((p) => p.trim())
+    .filter(Boolean);
+}
+
+function extractBulletLines(raw: string): string[] {
+  const lines = raw.replace(/\r/g, "").split("\n");
+  const out: string[] = [];
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+    const m = trimmed.match(/^(?:[-*]|•|\u2022)\s+(.*)$/);
+    if (m?.[1]) out.push(m[1].trim());
+  }
+
+  return out;
+}
+
+function extractSentences(raw: string): string[] {
+  const normalized = raw.replace(/\s+/g, " ").trim();
+  if (!normalized) return [];
+  return normalized
+    .split(/(?<=[.!?])\s+/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
+function parseHackGuideSteps(raw: string): HackGuideStep[] {
+  const lines = raw.replace(/\r/g, "").split("\n");
+  const steps: HackGuideStep[] = [];
+
+  const headerRe = /^(?:step\s*)?(\d{1,2})\s*[).:\-]\s*(.+)$/i;
+  const stepWordRe = /^step\s*(\d{1,2})\b\s*:?\s*(.*)$/i;
+
+  let current: HackGuideStep | null = null;
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+
+    const m1 = trimmed.match(stepWordRe);
+    const m2 = trimmed.match(headerRe);
+    const matched = m1 ?? m2;
+
+    if (matched) {
+      if (current) steps.push(current);
+      const title = (matched[2] ?? matched[1] ?? "").trim();
+      current = { title: title || `Step ${matched[1]}` };
+      continue;
+    }
+
+    // If we already started steps, keep appending supporting lines into body.
+    if (current) {
+      current.body = current.body
+        ? `${current.body}\n${trimmed}`
+        : trimmed;
+    }
+  }
+
+  if (current) steps.push(current);
+  return steps.slice(0, 10);
+}
+
+function parseGuideSections(raw: string): {
+  takeawaysText: string;
+  stepsText: string;
+  proTipsText: string;
+  bodyText: string;
+} {
+  const lines = raw.replace(/\r/g, "").split("\n");
+
+  type SectionKey = "takeaways" | "steps" | "proTips" | "body";
+  let current: SectionKey = "body";
+  const takeaways: string[] = [];
+  const steps: string[] = [];
+  const proTips: string[] = [];
+  const body: string[] = [];
+
+  const normalizeHeading = (s: string) =>
+    s
+      .replace(/^#+\s*/, "")
+      .replace(/[:：]$/, "")
+      .trim()
+      .toLowerCase();
+
+  const isHeading = (s: string) => {
+    const h = normalizeHeading(s);
+    if (!h) return null;
+    if (
+      h === "key takeaway" ||
+      h === "key takeaways" ||
+      h === "takeaways" ||
+      h === "takeaway"
+    )
+      return "takeaways" as const;
+    if (
+      h === "step-by-step guide" ||
+      h === "step by step" ||
+      h === "step-by-step" ||
+      h === "steps" ||
+      h === "guide" ||
+      h === "how to"
+    )
+      return "steps" as const;
+    if (h === "pro tips" || h === "pro tip" || h === "extra tips")
+      return "proTips" as const;
+    return null;
+  };
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed) {
+      // Keep paragraph breaks inside sections.
+      if (current === "takeaways") takeaways.push("");
+      else if (current === "steps") steps.push("");
+      else if (current === "proTips") proTips.push("");
+      else body.push("");
+      continue;
+    }
+
+    const section = isHeading(trimmed);
+    if (section) {
+      current = section;
+      continue;
+    }
+
+    if (current === "takeaways") takeaways.push(line);
+    else if (current === "steps") steps.push(line);
+    else if (current === "proTips") proTips.push(line);
+    else body.push(line);
+  }
+
+  return {
+    takeawaysText: takeaways.join("\n").trim(),
+    stepsText: steps.join("\n").trim(),
+    proTipsText: proTips.join("\n").trim(),
+    bodyText: body.join("\n").trim(),
+  };
+}
+
+function buildHackGuide(raw: string): {
+  summary: string;
+  takeaways: string[];
+  steps: HackGuideStep[];
+  proTips: string[];
+} {
+  const text = raw.replace(/\r/g, "").trim();
+  const paragraphs = splitParagraphs(text);
+  const summary = paragraphs.length > 0 ? toExcerpt(paragraphs[0], 220) : "";
+
+  const { takeawaysText, stepsText, proTipsText, bodyText } =
+    parseGuideSections(text);
+
+  const takeawaysFromSection = extractBulletLines(takeawaysText);
+  const takeawaysFromBody = extractBulletLines(bodyText);
+  const takeawaysFromSentences = extractSentences(bodyText)
+    .slice(0, 6)
+    .map((s) => toExcerpt(s, 140));
+
+  const takeaways = (
+    takeawaysFromSection.length
+      ? takeawaysFromSection
+      : takeawaysFromBody.length
+        ? takeawaysFromBody
+        : takeawaysFromSentences
+  )
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .slice(0, 4);
+
+  let steps = parseHackGuideSteps(stepsText || bodyText);
+
+  if (steps.length === 0 && paragraphs.length > 1) {
+    const derived = paragraphs.slice(1, 5).map((p) => {
+      const sentences = extractSentences(p);
+      const title = toExcerpt(sentences[0] ?? p, 80);
+      const body = sentences.length > 1 ? sentences.slice(1).join(" ") : "";
+      return { title, body: body ? toExcerpt(body, 180) : undefined };
+    });
+    steps = derived.filter((s) => s.title.trim().length > 0);
+  }
+
+  const proTipsFromSection = extractBulletLines(proTipsText);
+  const proTipsFromBody = extractBulletLines(text)
+    .filter((b) => /\btip\b/i.test(b) || b.length <= 120)
+    .slice(0, 10);
+
+  const proTips = (proTipsFromSection.length
+    ? proTipsFromSection
+    : proTipsFromBody)
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .slice(0, 8);
+
+  return { summary, takeaways, steps, proTips };
+}
+
 function normalizeGearType(value: string): string {
   return value.toLowerCase().replace(/\s+/g, " ").trim();
 }
@@ -896,6 +1109,7 @@ export default async function DynamicDetailPage(props: {
     );
 
   const isGear = type === "gear";
+  const isHack = type === "hack";
 
   const heroDescriptionText = (() => {
     if (aiSummaryLooksJson) return "";
@@ -912,6 +1126,249 @@ export default async function DynamicDetailPage(props: {
     const picked = sentences.slice(0, 2).join(" ").trim();
     return picked.length > 220 ? `${picked.slice(0, 217)}...` : picked;
   })();
+
+  if (isHack) {
+    const contentText =
+      toMultilineStringFromUnknown(record.fields["Content"]) ||
+      toMultilineStringFromUnknown(tips) ||
+      (aiSummaryLooksJson ? "" : toMultilineStringFromUnknown(fallbackAiSummary)) ||
+      toMultilineStringFromUnknown(rawReview);
+
+    const guide = buildHackGuide(contentText);
+
+    const difficultyText =
+      pickString(record.fields, [
+        "Difficulty level",
+        "Difficulty",
+        "Level",
+        "Skill level",
+      ]) ||
+      toShortStringFromUnknown(record.fields["Difficulty level"]);
+
+    const estimatedTimeText =
+      pickString(record.fields, [
+        "Estimated time",
+        "Estimated Time",
+        "Time",
+        "Duration",
+        "Prep time",
+      ]) || toShortStringFromUnknown(record.fields["Estimated time"]);
+
+    const situationText =
+      pickString(record.fields, [
+        "Situation",
+        "Scenario",
+        "Weather",
+        "Conditions",
+        "Use case",
+        "Use Case",
+      ]) || toShortStringFromUnknown(record.fields["Situation"]);
+
+    const heroSummary = guide.summary || heroDescriptionText;
+
+    const recommendedGearRaw =
+      record.fields["Recommended Gear"] ??
+      record.fields["Recommended gear"] ??
+      record.fields["Gear"] ??
+      record.fields["Related Gear"] ??
+      record.fields["Recommended Items"] ??
+      record.fields["Recommended Gear Items"];
+
+    const recommendedGearTokens = toStringListFromUnknown(recommendedGearRaw);
+
+    const recommendedGearLinks = recommendedGearTokens
+      .map((token) => {
+        const m = token.match(/rec[a-zA-Z0-9]{10,}/);
+        if (!m) return null;
+        const id = m[0];
+        const label = token.replace(id, "").replace(/[()\-–—:]+/g, " ").trim();
+        return { id, label: label || "Gear item" };
+      })
+      .filter(Boolean) as Array<{ id: string; label: string }>;
+
+    return (
+      <div className="min-h-screen bg-background px-4 py-10 text-foreground">
+        <div className="mx-auto w-full max-w-5xl space-y-6">
+          <Link
+            href={cfg.listHref}
+            className="text-sm font-medium text-foreground/80 hover:text-accent"
+          >
+            ← Back
+          </Link>
+
+          {/* Hero */}
+          <section className="rounded-3xl border border-zinc-200 bg-white shadow-sm dark:border-moss/30 dark:bg-forest">
+            <div className="grid grid-cols-1 gap-6 p-5 sm:p-6 md:grid-cols-2 md:items-center">
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="inline-flex items-center rounded-full bg-zinc-100 px-3 py-1 text-xs font-semibold text-zinc-900 dark:bg-moss/40 dark:text-sand">
+                    {cfg.badge}
+                  </span>
+
+                  {difficultyText ? (
+                    <span className="inline-flex items-center rounded-full border border-zinc-200 bg-white px-3 py-1 text-xs font-semibold text-foreground/80 dark:border-moss/30 dark:bg-forest/60 dark:text-sand/80">
+                      {difficultyText}
+                    </span>
+                  ) : null}
+
+                  {estimatedTimeText ? (
+                    <span className="inline-flex items-center rounded-full border border-zinc-200 bg-white px-3 py-1 text-xs font-semibold text-foreground/80 dark:border-moss/30 dark:bg-forest/60 dark:text-sand/80">
+                      {estimatedTimeText}
+                    </span>
+                  ) : null}
+
+                  {situationText ? (
+                    <span className="inline-flex items-center rounded-full border border-zinc-200 bg-white px-3 py-1 text-xs font-semibold text-foreground/80 dark:border-moss/30 dark:bg-forest/60 dark:text-sand/80">
+                      {situationText}
+                    </span>
+                  ) : null}
+                </div>
+
+                <h1 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
+                  {title}
+                </h1>
+
+                {heroSummary ? (
+                  <p className="mt-3 text-sm leading-6 text-foreground/70">
+                    {heroSummary}
+                  </p>
+                ) : null}
+              </div>
+
+              <div className="overflow-hidden rounded-2xl bg-zinc-100 ring-1 ring-zinc-200 dark:bg-moss dark:ring-moss/40">
+                <div className="aspect-[4/3] w-full">
+                  {imageUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={imageUrl}
+                      alt={title}
+                      className="h-full w-full object-cover"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center text-sm text-zinc-500 dark:text-sand/70">
+                      No image
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Key Takeaway */}
+          <section className="rounded-3xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-moss/30 dark:bg-forest">
+            <header className="space-y-1">
+              <h2 className="text-base font-semibold">Key Takeaway</h2>
+              <p className="text-xs leading-5 text-foreground/60">
+                The most important advice to remember.
+              </p>
+            </header>
+
+            {guide.takeaways.length > 0 ? (
+              <ul className="mt-4 list-disc space-y-2 pl-5 text-sm leading-6 text-foreground/80">
+                {guide.takeaways.slice(0, 4).map((item, idx) => (
+                  <li key={`${idx}-${item}`}>{item}</li>
+                ))}
+              </ul>
+            ) : (
+              <p className="mt-4 text-sm leading-6 text-foreground/60">
+                No takeaways available yet.
+              </p>
+            )}
+          </section>
+
+          {/* Step-by-step Guide */}
+          <section className="rounded-3xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-moss/30 dark:bg-forest">
+            <header className="space-y-1">
+              <h2 className="text-base font-semibold">Step-by-step Guide</h2>
+              <p className="text-xs leading-5 text-foreground/60">
+                Follow these steps in order.
+              </p>
+            </header>
+
+            {guide.steps.length > 0 ? (
+              <ol className="mt-4 space-y-3">
+                {guide.steps.slice(0, 8).map((step, idx) => (
+                  <li
+                    key={`${idx}-${step.title}`}
+                    className="rounded-2xl bg-white p-4 ring-1 ring-zinc-200/80 shadow-sm dark:bg-forest/60 dark:ring-moss/30"
+                  >
+                    <div className="flex gap-4">
+                      <div className="flex h-9 w-9 flex-none items-center justify-center rounded-full bg-zinc-100 text-sm font-semibold text-zinc-900 ring-1 ring-zinc-200 dark:bg-moss/40 dark:text-sand dark:ring-moss/40">
+                        {idx + 1}
+                      </div>
+
+                      <div className="min-w-0">
+                        <h3 className="text-sm font-semibold">{step.title}</h3>
+                        {step.body ? (
+                          <p className="mt-1 whitespace-pre-line text-sm leading-6 text-foreground/70">
+                            {step.body}
+                          </p>
+                        ) : null}
+                      </div>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            ) : (
+              <p className="mt-4 text-sm leading-6 text-foreground/60">
+                No steps available yet.
+              </p>
+            )}
+          </section>
+
+          {/* Pro Tips */}
+          <section className="rounded-3xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-moss/30 dark:bg-forest">
+            <header className="space-y-1">
+              <h2 className="text-base font-semibold">Pro Tips</h2>
+              <p className="text-xs leading-5 text-foreground/60">
+                Extra advice that makes the difference.
+              </p>
+            </header>
+
+            {guide.proTips.length > 0 ? (
+              <ul className="mt-4 space-y-2 text-sm leading-6 text-foreground/80">
+                {guide.proTips.slice(0, 8).map((item, idx) => (
+                  <li key={`${idx}-${item}`} className="flex gap-2">
+                    <span className="mt-[2px] text-accent">•</span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="mt-4 text-sm leading-6 text-foreground/60">
+                No pro tips available yet.
+              </p>
+            )}
+          </section>
+
+          {/* Recommended Gear (optional) */}
+          {recommendedGearLinks.length > 0 ? (
+            <section className="rounded-3xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-moss/30 dark:bg-forest">
+              <header className="space-y-1">
+                <h2 className="text-base font-semibold">Recommended Gear</h2>
+                <p className="text-xs leading-5 text-foreground/60">
+                  Helpful items related to this tip.
+                </p>
+              </header>
+
+              <div className="mt-4 flex flex-wrap gap-2">
+                {recommendedGearLinks.slice(0, 10).map((g) => (
+                  <Link
+                    key={g.id}
+                    href={`/gear/${g.id}`}
+                    className="inline-flex items-center rounded-full border border-zinc-200 bg-white px-3 py-1 text-xs font-semibold text-foreground/80 hover:bg-zinc-50 dark:border-moss/30 dark:bg-forest/60 dark:text-sand/80 dark:hover:bg-forest"
+                  >
+                    {g.label}
+                  </Link>
+                ))}
+              </div>
+            </section>
+          ) : null}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background px-4 py-10 text-foreground">
