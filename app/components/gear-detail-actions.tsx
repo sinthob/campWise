@@ -25,7 +25,9 @@ export default function GearDetailActions(props: {
   const saveKey = `campwise:saved:${props.recordId}:gear`;
   const addedKey = `campwise:gear-added:${props.recordId}`;
 
-  const [saved, setSaved] = useState(() => safeLocalStorageGet(saveKey) === "1");
+  const [saved, setSaved] = useState(
+    () => safeLocalStorageGet(saveKey) === "1",
+  );
   const [added, setAdded] = useState(false);
   const [shared, setShared] = useState(false);
 

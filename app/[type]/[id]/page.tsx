@@ -416,6 +416,64 @@ function parseAiInsightJson(raw: string | undefined | null): {
   }
 }
 
+type CampingTipsJson = Partial<{
+  pros: unknown;
+  cons: unknown;
+  use_cases: unknown;
+  useCases: unknown;
+  best_use_cases: unknown;
+  bestUseCases: unknown;
+  bestFor: unknown;
+  strengths: unknown;
+  weaknesses: unknown;
+  summary: unknown;
+  verdict: unknown;
+  aiVerdict: unknown;
+  ai_summary: unknown;
+  aiSummary: unknown;
+}>;
+
+function parseCampingTipsJson(raw: string | undefined | null): {
+  pros: string[];
+  cons: string[];
+  useCases: string[];
+  summaryText: string;
+} | null {
+  if (!raw || typeof raw !== "string") return null;
+
+  const trimmed = raw.trim();
+  if (!trimmed) return null;
+  if (!(trimmed.startsWith("{") || trimmed.startsWith("["))) return null;
+
+  try {
+    const parsed = JSON.parse(trimmed) as unknown;
+    if (!parsed || typeof parsed !== "object") return null;
+
+    const obj = parsed as CampingTipsJson;
+    const pros = toStringListFromUnknown(obj.pros ?? obj.strengths);
+    const cons = toStringListFromUnknown(obj.cons ?? obj.weaknesses);
+    const useCases = toStringListFromUnknown(
+      obj.use_cases ??
+        obj.useCases ??
+        obj.best_use_cases ??
+        obj.bestUseCases ??
+        obj.bestFor,
+    );
+
+    const summaryText = toShortStringFromUnknown(
+      obj.summary ?? obj.aiSummary ?? obj.ai_summary ?? obj.verdict ?? obj.aiVerdict,
+    );
+
+    if (pros.length === 0 && cons.length === 0 && useCases.length === 0 && !summaryText) {
+      return null;
+    }
+
+    return { pros, cons, useCases, summaryText };
+  } catch {
+    return null;
+  }
+}
+
 type HackGuideStep = {
   title: string;
   body?: string;
@@ -485,9 +543,7 @@ function parseHackGuideSteps(raw: string): HackGuideStep[] {
 
     // If we already started steps, keep appending supporting lines into body.
     if (current) {
-      current.body = current.body
-        ? `${current.body}\n${trimmed}`
-        : trimmed;
+      current.body = current.body ? `${current.body}\n${trimmed}` : trimmed;
     }
   }
 
@@ -619,9 +675,9 @@ function buildHackGuide(raw: string): {
     .filter((b) => /\btip\b/i.test(b) || b.length <= 120)
     .slice(0, 10);
 
-  const proTips = (proTipsFromSection.length
-    ? proTipsFromSection
-    : proTipsFromBody)
+  const proTips = (
+    proTipsFromSection.length ? proTipsFromSection : proTipsFromBody
+  )
     .map((s) => s.trim())
     .filter(Boolean)
     .slice(0, 8);
@@ -1044,6 +1100,9 @@ export default async function DynamicDetailPage(props: {
       })
     : "";
 
+  const tipsJson =
+    parseCampingTipsJson(tips) || parseCampingTipsJson(fallbackAiSummary);
+
   const weightText =
     pickString(record.fields, [
       "Weight",
@@ -1095,11 +1154,23 @@ export default async function DynamicDetailPage(props: {
     return picked.length > 220 ? `${picked.slice(0, 217)}...` : picked;
   })();
 
+  const aiSummarySectionText = (() => {
+    const fromJson = tipsJson?.summaryText?.trim();
+    if (fromJson) return fromJson;
+    if (!aiSummaryLooksJson && fallbackAiSummary)
+      return toExcerpt(fallbackAiSummary, 360);
+    if (heroDescriptionText) return heroDescriptionText;
+    if (strengthsList.length > 0) return toExcerpt(strengthsList[0], 240);
+    return "";
+  })();
+
   if (isHack) {
     const contentText =
       toMultilineStringFromUnknown(record.fields["Content"]) ||
       toMultilineStringFromUnknown(tips) ||
-      (aiSummaryLooksJson ? "" : toMultilineStringFromUnknown(fallbackAiSummary)) ||
+      (aiSummaryLooksJson
+        ? ""
+        : toMultilineStringFromUnknown(fallbackAiSummary)) ||
       toMultilineStringFromUnknown(rawReview);
 
     const guide = buildHackGuide(contentText);
@@ -1110,8 +1181,7 @@ export default async function DynamicDetailPage(props: {
         "Difficulty",
         "Level",
         "Skill level",
-      ]) ||
-      toShortStringFromUnknown(record.fields["Difficulty level"]);
+      ]) || toShortStringFromUnknown(record.fields["Difficulty level"]);
 
     const estimatedTimeText =
       pickString(record.fields, [
@@ -1149,7 +1219,10 @@ export default async function DynamicDetailPage(props: {
         const m = token.match(/rec[a-zA-Z0-9]{10,}/);
         if (!m) return null;
         const id = m[0];
-        const label = token.replace(id, "").replace(/[()\-–—:]+/g, " ").trim();
+        const label = token
+          .replace(id, "")
+          .replace(/[()\-–—:]+/g, " ")
+          .trim();
         return { id, label: label || "Gear item" };
       })
       .filter(Boolean) as Array<{ id: string; label: string }>;
@@ -1340,7 +1413,7 @@ export default async function DynamicDetailPage(props: {
 
   return (
     <div className="min-h-screen bg-background px-4 py-10 text-foreground">
-      <div className="mx-auto w-full max-w-5xl space-y-12">
+      <div className="mx-auto w-full max-w-5xl">
         <Link
           href={cfg.listHref}
           className="text-sm font-medium text-foreground/80 hover:text-accent"
@@ -1349,7 +1422,7 @@ export default async function DynamicDetailPage(props: {
         </Link>
 
         {/* Hero: image + product summary */}
-        <section className="rounded-3xl border border-zinc-200 bg-white dark:border-moss/30 dark:bg-forest">
+        <section className="mt-6 rounded-3xl border border-zinc-200 bg-white dark:border-moss/30 dark:bg-forest">
           <div className="grid grid-cols-1 gap-8 p-6 lg:grid-cols-2 lg:items-start">
             <div className="overflow-hidden rounded-2xl bg-zinc-100 ring-1 ring-zinc-200 dark:bg-moss dark:ring-moss/40">
               <div className="aspect-[4/3] w-full">
@@ -1387,18 +1460,6 @@ export default async function DynamicDetailPage(props: {
               </h1>
 
               {(() => {
-                const verdictRaw = heroDescriptionText || strengthsList[0] || "";
-                const verdict = verdictRaw ? toExcerpt(verdictRaw, 220) : "";
-                if (!verdict) return null;
-
-                return (
-                  <p className="mt-3 max-w-xl text-sm leading-6 text-foreground/70">
-                    {verdict}
-                  </p>
-                );
-              })()}
-
-              {(() => {
                 const capacityText = pickValue(record.fields, [
                   "Capacity",
                   "People",
@@ -1419,7 +1480,7 @@ export default async function DynamicDetailPage(props: {
                   capacityText
                     ? { icon: "👥", label: "Capacity", value: capacityText }
                     : null,
-                  (categoryText || location)
+                  categoryText || location
                     ? {
                         icon: "🧭",
                         label: "Category",
@@ -1445,7 +1506,7 @@ export default async function DynamicDetailPage(props: {
                 if (attrs.length === 0) return null;
 
                 return (
-                  <div className="mt-5 flex flex-wrap gap-3">
+                  <div className="mt-4 flex flex-wrap gap-3">
                     {attrs.map((a) => (
                       <div
                         key={a.label}
@@ -1461,14 +1522,45 @@ export default async function DynamicDetailPage(props: {
                   </div>
                 );
               })()}
+
+              {(() => {
+                const verdictRaw =
+                  heroDescriptionText || tipsJson?.summaryText || strengthsList[0] || "";
+                const fallbackCon = weaknessesList[0] ? ` Trade-off: ${weaknessesList[0]}` : "";
+                const verdict = verdictRaw ? `${toExcerpt(verdictRaw, 220)}${fallbackCon}`.trim() : "";
+                if (!verdict) return null;
+
+                return (
+                  <div className="mt-5">
+                    <div className="text-xs font-semibold uppercase tracking-wide text-foreground/60">
+                      AI Verdict
+                    </div>
+                    <p className="mt-2 max-w-xl text-sm leading-6 text-foreground/80">
+                      {verdict}
+                    </p>
+                  </div>
+                );
+              })()}
             </div>
           </div>
         </section>
 
+        {/* AI Summary */}
+        <section aria-label="AI summary" className="mt-16">
+          <div className="rounded-2xl border border-zinc-200 bg-zinc-50 p-6 dark:border-moss/30 dark:bg-forest/60">
+            <div className="text-sm font-semibold">AI Summary</div>
+            <p className="mt-2 text-sm leading-6 text-foreground/80">
+              {aiSummarySectionText || "No AI summary available yet."}
+            </p>
+          </div>
+        </section>
+
         {/* Product Details */}
-        <section aria-label="Product details" className="space-y-4">
+        <section aria-label="Product details" className="mt-16 space-y-4">
           <header className="space-y-1">
-            <h2 className="text-xl font-semibold tracking-tight">Product Details</h2>
+            <h2 className="text-xl font-semibold tracking-tight">
+              Product Details
+            </h2>
             <p className="text-sm leading-6 text-foreground/60">
               Clean specs and metadata.
             </p>
@@ -1507,11 +1599,12 @@ export default async function DynamicDetailPage(props: {
             const items = [
               brandText ? { label: "Brand", value: brandText } : null,
               modelText ? { label: "Model", value: modelText } : null,
-              (categoryText || location)
+              categoryText || location
                 ? { label: "Category", value: categoryText || location }
                 : null,
               capacityText ? { label: "Capacity", value: capacityText } : null,
               weightText ? { label: "Weight", value: weightText } : null,
+              seasonText ? { label: "Season", value: seasonText } : null,
               createdDateText
                 ? { label: "Created", value: createdDateText }
                 : null,
@@ -1526,7 +1619,7 @@ export default async function DynamicDetailPage(props: {
             }
 
             return (
-              <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
+              <div className="grid grid-cols-2 gap-6 md:grid-cols-3">
                 {items.map((it) => (
                   <div
                     key={it.label}
@@ -1545,101 +1638,88 @@ export default async function DynamicDetailPage(props: {
           })()}
         </section>
 
-        {/* AI Evaluation */}
-        {strengthsList.length > 0 ||
-        weaknessesList.length > 0 ||
-        bestForList.length > 0 ? (
-          <section aria-label="AI evaluation" className="space-y-4">
-            <header className="space-y-1">
-              <h2 className="text-xl font-semibold tracking-tight">AI Evaluation</h2>
-              <p className="text-sm leading-6 text-foreground/60">
-                Pros, cons, and best use cases in one place.
-              </p>
-            </header>
+        {/* Camping Tips: render JSON as Pros/Cons/Use Cases */}
+        {(() => {
+          const pros = tipsJson?.pros?.length ? tipsJson.pros : strengthsList;
+          const cons = tipsJson?.cons?.length ? tipsJson.cons : weaknessesList;
+          const useCases = tipsJson?.useCases?.length
+            ? tipsJson.useCases
+            : bestForList;
 
-            <div className="grid gap-6 md:grid-cols-2">
-              <div className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-moss/30 dark:bg-forest/60">
-                <h3 className="text-base font-semibold">Pros</h3>
-                {strengthsList.length > 0 ? (
+          if (pros.length === 0 && cons.length === 0 && useCases.length === 0) {
+            return null;
+          }
+
+          return (
+            <section aria-label="Camping tips" className="mt-16 space-y-6">
+              <header className="space-y-1">
+                <h2 className="text-xl font-semibold tracking-tight">
+                  Camping Tips
+                </h2>
+                <p className="text-sm leading-6 text-foreground/60">
+                  Pros, cons, and best use cases — formatted for quick reading.
+                </p>
+              </header>
+
+              <div className="grid gap-8 md:grid-cols-2">
+                <div className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-moss/30 dark:bg-forest/60">
+                  <h3 className="text-base font-semibold">Pros</h3>
+                  {pros.length > 0 ? (
+                    <ul className="mt-4 space-y-2 text-sm leading-6 text-foreground/80">
+                      {pros.slice(0, 10).map((item, idx) => (
+                        <li key={`${idx}-${item}`} className="flex gap-2">
+                          <span className="mt-[2px] text-accent">•</span>
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="mt-3 text-sm text-foreground/60">
+                      No pros listed.
+                    </p>
+                  )}
+                </div>
+
+                <div className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-moss/30 dark:bg-forest/60">
+                  <h3 className="text-base font-semibold">Cons</h3>
+                  {cons.length > 0 ? (
+                    <ul className="mt-4 space-y-2 text-sm leading-6 text-foreground/80">
+                      {cons.slice(0, 10).map((item, idx) => (
+                        <li key={`${idx}-${item}`} className="flex gap-2">
+                          <span className="mt-[2px] text-foreground/60">•</span>
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="mt-3 text-sm text-foreground/60">
+                      No cons listed.
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {useCases.length > 0 ? (
+                <div className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-moss/30 dark:bg-forest/60">
+                  <h3 className="text-base font-semibold">Best Use Cases</h3>
                   <ul className="mt-4 space-y-2 text-sm leading-6 text-foreground/80">
-                    {strengthsList.slice(0, 10).map((item, idx) => (
+                    {useCases.slice(0, 12).map((item, idx) => (
                       <li key={`${idx}-${item}`} className="flex gap-2">
-                        <span className="mt-[2px] text-accent">✔</span>
+                        <span className="mt-[2px] text-accent">•</span>
                         <span>{item}</span>
                       </li>
                     ))}
                   </ul>
-                ) : (
-                  <p className="mt-3 text-sm text-foreground/60">No pros listed.</p>
-                )}
-              </div>
-
-              <div className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-moss/30 dark:bg-forest/60">
-                <h3 className="text-base font-semibold">Cons</h3>
-                {weaknessesList.length > 0 ? (
-                  <ul className="mt-4 space-y-2 text-sm leading-6 text-foreground/80">
-                    {weaknessesList.slice(0, 10).map((item, idx) => (
-                      <li key={`${idx}-${item}`} className="flex gap-2">
-                        <span className="mt-[2px] text-foreground/60">✖</span>
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="mt-3 text-sm text-foreground/60">No cons listed.</p>
-                )}
-              </div>
-            </div>
-
-            {bestForList.length > 0 ? (
-              <div className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-moss/30 dark:bg-forest/60">
-                <h3 className="text-base font-semibold">Best Use Case</h3>
-                <ul className="mt-4 space-y-2 text-sm leading-6 text-foreground/80">
-                  {bestForList.slice(0, 10).map((item, idx) => (
-                    <li key={`${idx}-${item}`} className="flex gap-2">
-                      <span className="mt-[2px] text-accent">•</span>
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ) : null}
-          </section>
-        ) : null}
-
-        {/* Camping Tips */}
-        {tipsList.length > 0 ? (
-          <section aria-label="Camping tips" className="space-y-4">
-            <header className="space-y-1">
-              <h2 className="text-xl font-semibold tracking-tight">Camping Tips</h2>
-              <p className="text-sm leading-6 text-foreground/60">
-                Actionable advice you can apply immediately.
-              </p>
-            </header>
-
-            <ul className="space-y-2 text-sm leading-6 text-foreground/80">
-              {tipsList
-                .map((t) =>
-                  t
-                    .replace(/^\s*(?:\d+\s*[).:\-]|[-*]|•|\u2022)\s+/i, "")
-                    .trim(),
-                )
-                .filter(Boolean)
-                .slice(0, 12)
-                .map((item, idx) => (
-                  <li key={`${idx}-${item}`} className="flex gap-2">
-                    <span className="mt-[2px] text-accent">•</span>
-                    <span>{item}</span>
-                  </li>
-                ))}
-            </ul>
-          </section>
-        ) : null}
+                </div>
+              ) : null}
+            </section>
+          );
+        })()}
 
         {/* Actions */}
         <section
           aria-label="Actions"
-          className="border-t border-zinc-200 pt-8 dark:border-moss/30"
+          className="mt-16 border-t border-zinc-200 pt-8 dark:border-moss/30"
         >
           <GearDetailActions recordId={id} title={title} />
         </section>
