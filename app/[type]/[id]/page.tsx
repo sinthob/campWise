@@ -1154,16 +1154,6 @@ export default async function DynamicDetailPage(props: {
     return picked.length > 220 ? `${picked.slice(0, 217)}...` : picked;
   })();
 
-  const aiSummarySectionText = (() => {
-    const fromJson = tipsJson?.summaryText?.trim();
-    if (fromJson) return fromJson;
-    if (!aiSummaryLooksJson && fallbackAiSummary)
-      return toExcerpt(fallbackAiSummary, 360);
-    if (heroDescriptionText) return heroDescriptionText;
-    if (strengthsList.length > 0) return toExcerpt(strengthsList[0], 240);
-    return "";
-  })();
-
   if (isHack) {
     const contentText =
       toMultilineStringFromUnknown(record.fields["Content"]) ||
@@ -1423,41 +1413,48 @@ export default async function DynamicDetailPage(props: {
 
         {/* Hero: image + product summary */}
         <section className="mt-6 rounded-3xl border border-zinc-200 bg-white dark:border-moss/30 dark:bg-forest">
-          <div className="grid grid-cols-1 gap-8 p-6 lg:grid-cols-2 lg:items-start">
-            <div className="overflow-hidden rounded-2xl bg-zinc-100 ring-1 ring-zinc-200 dark:bg-moss dark:ring-moss/40">
-              <div className="aspect-[4/3] w-full">
-                {imageUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={imageUrl}
-                    alt={title}
-                    className="h-full w-full object-cover"
-                    loading="lazy"
-                  />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center text-sm text-zinc-500 dark:text-sand/70">
-                    No image
-                  </div>
-                )}
+          <div className="p-6">
+            {createdDateText ? (
+              <div className="flex justify-end text-xs font-medium text-foreground/60">
+                เพิ่มข้อมูลเมื่อ {createdDateText}
               </div>
-            </div>
+            ) : null}
 
-            <div className="min-w-0">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="inline-flex items-center rounded-full bg-zinc-100 px-3 py-1 text-xs font-semibold text-zinc-900 dark:bg-moss/40 dark:text-sand">
-                  {cfg.badge}
-                </span>
+            <div className="mt-4 grid grid-cols-1 gap-8 lg:grid-cols-2 lg:items-start">
+              <div className="overflow-hidden rounded-2xl bg-zinc-100 ring-1 ring-zinc-200 dark:bg-moss dark:ring-moss/40">
+                <div className="aspect-[4/3] w-full">
+                  {imageUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={imageUrl}
+                      alt={title}
+                      className="h-full w-full object-cover"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center text-sm text-zinc-500 dark:text-sand/70">
+                      No image
+                    </div>
+                  )}
+                </div>
+              </div>
 
-                {location ? (
-                  <span className="inline-flex items-center rounded-full border border-zinc-200 bg-white px-3 py-1 text-xs font-semibold text-foreground/80 dark:border-moss/30 dark:bg-forest/60 dark:text-sand/80">
-                    {location}
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="inline-flex items-center rounded-full bg-zinc-100 px-3 py-1 text-xs font-semibold text-zinc-900 dark:bg-moss/40 dark:text-sand">
+                    {cfg.badge}
                   </span>
-                ) : null}
-              </div>
 
-              <h1 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
-                {title}
-              </h1>
+                  {location ? (
+                    <span className="inline-flex items-center rounded-full border border-zinc-200 bg-white px-3 py-1 text-xs font-semibold text-foreground/80 dark:border-moss/30 dark:bg-forest/60 dark:text-sand/80">
+                      {location}
+                    </span>
+                  ) : null}
+                </div>
+
+                <h1 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
+                  {title}
+                </h1>
 
               {(() => {
                 const capacityText = pickValue(record.fields, [
@@ -1523,35 +1520,33 @@ export default async function DynamicDetailPage(props: {
                 );
               })()}
 
-              {(() => {
-                const verdictRaw =
-                  heroDescriptionText || tipsJson?.summaryText || strengthsList[0] || "";
-                const fallbackCon = weaknessesList[0] ? ` Trade-off: ${weaknessesList[0]}` : "";
-                const verdict = verdictRaw ? `${toExcerpt(verdictRaw, 220)}${fallbackCon}`.trim() : "";
-                if (!verdict) return null;
+                {(() => {
+                  const verdictRaw =
+                    heroDescriptionText ||
+                    tipsJson?.summaryText ||
+                    strengthsList[0] ||
+                    "";
+                  const fallbackCon = weaknessesList[0]
+                    ? ` Trade-off: ${weaknessesList[0]}`
+                    : "";
+                  const verdict = verdictRaw
+                    ? `${toExcerpt(verdictRaw, 220)}${fallbackCon}`.trim()
+                    : "";
+                  if (!verdict) return null;
 
-                return (
-                  <div className="mt-5">
-                    <div className="text-xs font-semibold uppercase tracking-wide text-foreground/60">
-                      AI Verdict
+                  return (
+                    <div className="mt-5">
+                      <div className="text-xs font-semibold uppercase tracking-wide text-foreground/60">
+                        AI Verdict
+                      </div>
+                      <p className="mt-2 max-w-xl text-sm leading-6 text-foreground/80">
+                        {verdict}
+                      </p>
                     </div>
-                    <p className="mt-2 max-w-xl text-sm leading-6 text-foreground/80">
-                      {verdict}
-                    </p>
-                  </div>
-                );
-              })()}
+                  );
+                })()}
+              </div>
             </div>
-          </div>
-        </section>
-
-        {/* AI Summary */}
-        <section aria-label="AI summary" className="mt-16">
-          <div className="rounded-2xl border border-zinc-200 bg-zinc-50 p-6 dark:border-moss/30 dark:bg-forest/60">
-            <div className="text-sm font-semibold">AI Summary</div>
-            <p className="mt-2 text-sm leading-6 text-foreground/80">
-              {aiSummarySectionText || "No AI summary available yet."}
-            </p>
           </div>
         </section>
 
@@ -1605,9 +1600,6 @@ export default async function DynamicDetailPage(props: {
               capacityText ? { label: "Capacity", value: capacityText } : null,
               weightText ? { label: "Weight", value: weightText } : null,
               seasonText ? { label: "Season", value: seasonText } : null,
-              createdDateText
-                ? { label: "Created", value: createdDateText }
-                : null,
             ].filter(Boolean) as Array<{ label: string; value: string }>;
 
             if (items.length === 0) {
@@ -1651,19 +1643,16 @@ export default async function DynamicDetailPage(props: {
           }
 
           return (
-            <section aria-label="Camping tips" className="mt-16 space-y-6">
+            <section aria-label="รายละเอียดเพิ่มเติม" className="mt-16 space-y-6">
               <header className="space-y-1">
                 <h2 className="text-xl font-semibold tracking-tight">
-                  Camping Tips
+                  รายละเอียดเพิ่มเติม
                 </h2>
-                <p className="text-sm leading-6 text-foreground/60">
-                  Pros, cons, and best use cases — formatted for quick reading.
-                </p>
               </header>
 
               <div className="grid gap-8 md:grid-cols-2">
                 <div className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-moss/30 dark:bg-forest/60">
-                  <h3 className="text-base font-semibold">Pros</h3>
+                  <h3 className="text-base font-semibold">ข้อดี</h3>
                   {pros.length > 0 ? (
                     <ul className="mt-4 space-y-2 text-sm leading-6 text-foreground/80">
                       {pros.slice(0, 10).map((item, idx) => (
@@ -1681,7 +1670,7 @@ export default async function DynamicDetailPage(props: {
                 </div>
 
                 <div className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-moss/30 dark:bg-forest/60">
-                  <h3 className="text-base font-semibold">Cons</h3>
+                  <h3 className="text-base font-semibold">ข้อจำกัด</h3>
                   {cons.length > 0 ? (
                     <ul className="mt-4 space-y-2 text-sm leading-6 text-foreground/80">
                       {cons.slice(0, 10).map((item, idx) => (
@@ -1701,7 +1690,7 @@ export default async function DynamicDetailPage(props: {
 
               {useCases.length > 0 ? (
                 <div className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-moss/30 dark:bg-forest/60">
-                  <h3 className="text-base font-semibold">Best Use Cases</h3>
+                  <h3 className="text-base font-semibold">เหมาะสำหรับ</h3>
                   <ul className="mt-4 space-y-2 text-sm leading-6 text-foreground/80">
                     {useCases.slice(0, 12).map((item, idx) => (
                       <li key={`${idx}-${item}`} className="flex gap-2">
