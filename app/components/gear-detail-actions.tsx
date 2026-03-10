@@ -61,13 +61,22 @@ export default function GearDetailActions(props: {
   }
 
   return (
-    <section aria-label="Actions" className="mt-5">
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+    <section aria-label="Actions">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+        <button
+          type="button"
+          onClick={addToGearList}
+          aria-pressed={added}
+          className="inline-flex h-11 w-full items-center justify-center rounded-full bg-accent px-6 text-sm font-semibold text-forest hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent sm:w-auto"
+        >
+          {added ? "✅ Added to Gear List" : "➕ Add to Gear List"}
+        </button>
+
         <button
           type="button"
           onClick={toggleSave}
           aria-pressed={saved}
-          className="inline-flex h-11 w-full items-center justify-center rounded-full bg-accent px-5 text-sm font-semibold text-forest hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="inline-flex h-11 w-full items-center justify-center rounded-full border border-zinc-200 bg-white px-6 text-sm font-semibold text-foreground hover:border-primary/30 hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent dark:border-transparent dark:bg-forest dark:text-sand dark:ring-1 dark:ring-moss/30 dark:hover:bg-forest/80 sm:w-auto"
         >
           {saved ? "🔖 Saved" : "🔖 Save"}
         </button>
@@ -75,18 +84,9 @@ export default function GearDetailActions(props: {
         <button
           type="button"
           onClick={share}
-          className="inline-flex h-11 w-full items-center justify-center rounded-full border border-zinc-200 bg-white px-5 text-sm font-semibold text-foreground hover:border-primary/30 hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent dark:border-transparent dark:bg-forest dark:text-sand dark:ring-1 dark:ring-moss/30 dark:hover:bg-forest/80"
+          className="inline-flex h-11 w-full items-center justify-center rounded-full border border-zinc-200 bg-white px-6 text-sm font-semibold text-foreground hover:border-primary/30 hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent dark:border-transparent dark:bg-forest dark:text-sand dark:ring-1 dark:ring-moss/30 dark:hover:bg-forest/80 sm:w-auto"
         >
           {shared ? "📤 Shared" : "📤 Share"}
-        </button>
-
-        <button
-          type="button"
-          onClick={addToGearList}
-          aria-pressed={added}
-          className="inline-flex h-11 w-full items-center justify-center rounded-full border border-zinc-200 bg-white px-5 text-sm font-semibold text-foreground hover:border-primary/30 hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent dark:border-transparent dark:bg-forest dark:text-sand dark:ring-1 dark:ring-moss/30 dark:hover:bg-forest/80"
-        >
-          {added ? "✅ Added" : "➕ Add to Gear List"}
         </button>
       </div>
     </section>

@@ -183,6 +183,15 @@ function pickString(fields: Record<string, unknown>, keys: string[]) {
   return "";
 }
 
+function pickValue(fields: Record<string, unknown>, keys: string[]) {
+  for (const k of keys) {
+    const v = fields[k];
+    const s = toShortStringFromUnknown(v);
+    if (s.trim().length > 0) return s.trim();
+  }
+  return "";
+}
+
 function getAnyAttachmentImageUrl(
   fields: Record<string, unknown>,
   preferredKeys: string[],
@@ -232,29 +241,6 @@ function getAnyAttachmentImageUrls(
 
   // Unique while preserving order.
   return Array.from(new Set(urls)).slice(0, 8);
-}
-
-function getQuickFacts(fields: Record<string, unknown>, excludeKeys: string[]) {
-  return Object.entries(fields)
-    .filter(([key]) => !excludeKeys.includes(key))
-    .filter(([, value]) => {
-      const t = typeof value;
-      return (
-        t === "string" || t === "number" || t === "boolean" || value === null
-      );
-    })
-    .map(([key, value]) => ({
-      key,
-      value:
-        value === null
-          ? "-"
-          : typeof value === "boolean"
-            ? value
-              ? "Yes"
-              : "No"
-            : String(value),
-    }))
-    .slice(0, 10);
 }
 
 function toStringListFromUnknown(value: unknown): string[] {
@@ -1050,13 +1036,13 @@ export default async function DynamicDetailPage(props: {
         tips ?? (aiSummaryLooksJson ? undefined : fallbackAiSummary),
       );
 
-  const hasAnyInsight =
-    strengthsList.length > 0 ||
-    weaknessesList.length > 0 ||
-    bestForList.length > 0 ||
-    tipsList.length > 0;
-
-  const quickFacts = getQuickFacts(record.fields, cfg.quickFactsExclude);
+  const createdDateText = record.createdTime
+    ? new Date(record.createdTime).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      })
+    : "";
 
   const weightText =
     pickString(record.fields, [
@@ -1088,24 +1074,6 @@ export default async function DynamicDetailPage(props: {
         record.fields["Best season"] ??
         record.fields["Season rating"] ??
         record.fields["Season Rating"],
-    );
-
-  const usageTypeText =
-    pickString(record.fields, [
-      "Usage type",
-      "Usage Type",
-      "Use case",
-      "Use Case",
-      "Usage",
-      "Ideal for",
-    ]) ||
-    toShortStringFromUnknown(
-      record.fields["Usage type"] ??
-        record.fields["Usage Type"] ??
-        record.fields["Use case"] ??
-        record.fields["Use Case"] ??
-        record.fields["Usage"] ??
-        record.fields["Ideal for"],
     );
 
   const isGear = type === "gear";
@@ -1372,7 +1340,7 @@ export default async function DynamicDetailPage(props: {
 
   return (
     <div className="min-h-screen bg-background px-4 py-10 text-foreground">
-      <div className="mx-auto w-full max-w-5xl space-y-8">
+      <div className="mx-auto w-full max-w-5xl space-y-12">
         <Link
           href={cfg.listHref}
           className="text-sm font-medium text-foreground/80 hover:text-accent"
@@ -1380,9 +1348,9 @@ export default async function DynamicDetailPage(props: {
           ← Back
         </Link>
 
-        {/* 1) Hero */}
-        <section className="rounded-3xl border border-zinc-200 bg-white shadow-sm dark:border-moss/30 dark:bg-forest">
-          <div className="grid grid-cols-1 gap-6 p-5 sm:p-6 md:grid-cols-2">
+        {/* Hero: image + product summary */}
+        <section className="rounded-3xl border border-zinc-200 bg-white dark:border-moss/30 dark:bg-forest">
+          <div className="grid grid-cols-1 gap-8 p-6 lg:grid-cols-2 lg:items-start">
             <div className="overflow-hidden rounded-2xl bg-zinc-100 ring-1 ring-zinc-200 dark:bg-moss dark:ring-moss/40">
               <div className="aspect-[4/3] w-full">
                 {imageUrl ? (
@@ -1408,7 +1376,7 @@ export default async function DynamicDetailPage(props: {
                 </span>
 
                 {location ? (
-                  <span className="inline-flex items-center rounded-full border border-zinc-200 bg-white px-3 py-1 text-xs font-semibold text-foreground/80 dark:border-moss/30 dark:bg-forest dark:text-sand/80">
+                  <span className="inline-flex items-center rounded-full border border-zinc-200 bg-white px-3 py-1 text-xs font-semibold text-foreground/80 dark:border-moss/30 dark:bg-forest/60 dark:text-sand/80">
                     {location}
                   </span>
                 ) : null}
@@ -1418,115 +1386,183 @@ export default async function DynamicDetailPage(props: {
                 {title}
               </h1>
 
-              {/* Gear-only: immediate context (what / who / when) as bullet points */}
-              {isGear &&
-              (heroDescriptionText ||
-                bestForList.length > 0 ||
-                strengthsList.length > 0) ? (
-                <div className="mt-3 rounded-2xl bg-white p-4 ring-1 ring-zinc-200/80 shadow-sm dark:bg-forest/60 dark:ring-moss/30">
-                  <div className="text-xs font-semibold text-foreground/60">
-                    Quick overview
+              {(() => {
+                const verdictRaw = heroDescriptionText || strengthsList[0] || "";
+                const verdict = verdictRaw ? toExcerpt(verdictRaw, 220) : "";
+                if (!verdict) return null;
+
+                return (
+                  <p className="mt-3 max-w-xl text-sm leading-6 text-foreground/70">
+                    {verdict}
+                  </p>
+                );
+              })()}
+
+              {(() => {
+                const capacityText = pickValue(record.fields, [
+                  "Capacity",
+                  "People",
+                  "Sleeps",
+                  "Sleeps (people)",
+                  "Persons",
+                  "Person",
+                ]);
+                const categoryText = pickValue(record.fields, [
+                  "Category",
+                  "Gear Type",
+                  "Type",
+                  "Gear Category",
+                ]);
+                const weatherSuitabilityText = seasonText;
+
+                const attrs = [
+                  capacityText
+                    ? { icon: "👥", label: "Capacity", value: capacityText }
+                    : null,
+                  (categoryText || location)
+                    ? {
+                        icon: "🧭",
+                        label: "Category",
+                        value: categoryText || location,
+                      }
+                    : null,
+                  weightText
+                    ? { icon: "⚖", label: "Weight", value: weightText }
+                    : null,
+                  weatherSuitabilityText
+                    ? {
+                        icon: "☁",
+                        label: "Weather",
+                        value: weatherSuitabilityText,
+                      }
+                    : null,
+                ].filter(Boolean) as Array<{
+                  icon: string;
+                  label: string;
+                  value: string;
+                }>;
+
+                if (attrs.length === 0) return null;
+
+                return (
+                  <div className="mt-5 flex flex-wrap gap-3">
+                    {attrs.map((a) => (
+                      <div
+                        key={a.label}
+                        className="inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-white px-4 py-2 text-sm font-medium text-foreground dark:border-moss/30 dark:bg-forest/60 dark:text-sand"
+                      >
+                        <span aria-hidden="true">{a.icon}</span>
+                        <span className="text-foreground/70 dark:text-sand/70">
+                          {a.label}:
+                        </span>
+                        <span className="font-semibold">{a.value}</span>
+                      </div>
+                    ))}
                   </div>
-
-                  <ul className="mt-2 list-disc space-y-1 pl-5 text-sm leading-6 text-foreground/80">
-                    {heroDescriptionText ? (
-                      <li>{heroDescriptionText}</li>
-                    ) : null}
-
-                    {bestForList.length > 0 ? (
-                      <li>
-                        <span className="font-semibold">Best for:</span>{" "}
-                        {bestForList.slice(0, 5).join(", ")}
-                      </li>
-                    ) : null}
-
-                    {strengthsList.length > 0 ? (
-                      <li>
-                        <span className="font-semibold">Highlights:</span>{" "}
-                        {strengthsList.slice(0, 4).join(", ")}
-                      </li>
-                    ) : null}
-                  </ul>
-                </div>
-              ) : null}
-
-              <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
-                {weightText ? (
-                  <div className="rounded-2xl bg-white p-4 ring-1 ring-zinc-200/80 shadow-sm dark:bg-forest/60 dark:ring-moss/30">
-                    <div className="text-xs font-semibold text-foreground/70">
-                      Weight
-                    </div>
-                    <div className="mt-1 text-sm font-semibold text-foreground">
-                      {weightText}
-                    </div>
-                  </div>
-                ) : null}
-
-                {seasonText ? (
-                  <div className="rounded-2xl bg-white p-4 ring-1 ring-zinc-200/80 shadow-sm dark:bg-forest/60 dark:ring-moss/30">
-                    <div className="text-xs font-semibold text-foreground/70">
-                      Season
-                    </div>
-                    <div className="mt-1 text-sm font-semibold text-foreground">
-                      {seasonText}
-                    </div>
-                  </div>
-                ) : null}
-
-                {usageTypeText ? (
-                  <div className="rounded-2xl bg-white p-4 ring-1 ring-zinc-200/80 shadow-sm dark:bg-forest/60 dark:ring-moss/30">
-                    <div className="text-xs font-semibold text-foreground/70">
-                      Usage
-                    </div>
-                    <div className="mt-1 text-sm font-semibold text-foreground">
-                      {usageTypeText}
-                    </div>
-                  </div>
-                ) : null}
-              </div>
+                );
+              })()}
             </div>
           </div>
         </section>
 
-        {/* 2) Use Cases (gear) */}
-        {isGear && bestForList.length > 0 ? (
-          <section className="rounded-3xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-moss/30 dark:bg-forest">
+        {/* Product Details */}
+        <section aria-label="Product details" className="space-y-4">
+          <header className="space-y-1">
+            <h2 className="text-xl font-semibold tracking-tight">Product Details</h2>
+            <p className="text-sm leading-6 text-foreground/60">
+              Clean specs and metadata.
+            </p>
+          </header>
+
+          {(() => {
+            const brandText = pickValue(record.fields, [
+              "Brand",
+              "Brand Name",
+              "Manufacturer",
+              "Company",
+              "Maker",
+            ]);
+            const modelText = pickValue(record.fields, [
+              "Model",
+              "Model Name",
+              "Model number",
+              "Model Number",
+              "Product Model",
+            ]);
+            const categoryText = pickValue(record.fields, [
+              "Category",
+              "Gear Type",
+              "Type",
+              "Gear Category",
+            ]);
+            const capacityText = pickValue(record.fields, [
+              "Capacity",
+              "People",
+              "Sleeps",
+              "Sleeps (people)",
+              "Persons",
+              "Person",
+            ]);
+
+            const items = [
+              brandText ? { label: "Brand", value: brandText } : null,
+              modelText ? { label: "Model", value: modelText } : null,
+              (categoryText || location)
+                ? { label: "Category", value: categoryText || location }
+                : null,
+              capacityText ? { label: "Capacity", value: capacityText } : null,
+              weightText ? { label: "Weight", value: weightText } : null,
+              createdDateText
+                ? { label: "Created", value: createdDateText }
+                : null,
+            ].filter(Boolean) as Array<{ label: string; value: string }>;
+
+            if (items.length === 0) {
+              return (
+                <p className="text-sm leading-6 text-foreground/60">
+                  No product details available yet.
+                </p>
+              );
+            }
+
+            return (
+              <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
+                {items.map((it) => (
+                  <div
+                    key={it.label}
+                    className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-moss/30 dark:bg-forest/60"
+                  >
+                    <div className="text-[11px] font-semibold uppercase tracking-wide text-foreground/60">
+                      {it.label}
+                    </div>
+                    <div className="mt-1 text-sm font-semibold text-foreground dark:text-sand">
+                      {it.value}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            );
+          })()}
+        </section>
+
+        {/* AI Evaluation */}
+        {strengthsList.length > 0 ||
+        weaknessesList.length > 0 ||
+        bestForList.length > 0 ? (
+          <section aria-label="AI evaluation" className="space-y-4">
             <header className="space-y-1">
-              <h2 className="text-base font-semibold">Use Cases</h2>
-              <p className="text-xs leading-5 text-foreground/60">
-                Quick ideas for when this gear shines.
+              <h2 className="text-xl font-semibold tracking-tight">AI Evaluation</h2>
+              <p className="text-sm leading-6 text-foreground/60">
+                Pros, cons, and best use cases in one place.
               </p>
             </header>
 
-            <div className="mt-4 flex flex-wrap gap-2">
-              {bestForList.slice(0, 10).map((item, idx) => (
-                <span
-                  key={`${idx}-${item}`}
-                  className="inline-flex items-center rounded-full border border-zinc-200 bg-white px-3 py-1 text-xs font-semibold text-foreground/80 dark:border-moss/30 dark:bg-forest/60 dark:text-sand/80"
-                >
-                  {item}
-                </span>
-              ))}
-            </div>
-          </section>
-        ) : null}
-
-        {/* 3) Pros / Cons (gear) */}
-        {isGear && (strengthsList.length > 0 || weaknessesList.length > 0) ? (
-          <section className="rounded-3xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-moss/30 dark:bg-forest">
-            <header className="space-y-1">
-              <h2 className="text-base font-semibold">Pros and Cons</h2>
-              <p className="text-xs leading-5 text-foreground/60">
-                A balanced view at a glance.
-              </p>
-            </header>
-
-            <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-              <div className="rounded-2xl bg-white p-4 ring-1 ring-zinc-200/80 shadow-sm dark:bg-forest/60 dark:ring-moss/30">
-                <h3 className="text-sm font-semibold">Pros</h3>
+            <div className="grid gap-6 md:grid-cols-2">
+              <div className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-moss/30 dark:bg-forest/60">
+                <h3 className="text-base font-semibold">Pros</h3>
                 {strengthsList.length > 0 ? (
-                  <ul className="mt-3 space-y-2 text-sm leading-6 text-foreground/80">
-                    {strengthsList.slice(0, 8).map((item, idx) => (
+                  <ul className="mt-4 space-y-2 text-sm leading-6 text-foreground/80">
+                    {strengthsList.slice(0, 10).map((item, idx) => (
                       <li key={`${idx}-${item}`} className="flex gap-2">
                         <span className="mt-[2px] text-accent">✔</span>
                         <span>{item}</span>
@@ -1534,133 +1570,79 @@ export default async function DynamicDetailPage(props: {
                     ))}
                   </ul>
                 ) : (
-                  <p className="mt-3 text-sm text-foreground/60">
-                    No pros listed.
-                  </p>
+                  <p className="mt-3 text-sm text-foreground/60">No pros listed.</p>
                 )}
               </div>
 
-              <div className="rounded-2xl bg-white p-4 ring-1 ring-zinc-200/80 shadow-sm dark:bg-forest/60 dark:ring-moss/30">
-                <h3 className="text-sm font-semibold">Cons</h3>
+              <div className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-moss/30 dark:bg-forest/60">
+                <h3 className="text-base font-semibold">Cons</h3>
                 {weaknessesList.length > 0 ? (
-                  <ul className="mt-3 space-y-2 text-sm leading-6 text-foreground/80">
-                    {weaknessesList.slice(0, 8).map((item, idx) => (
+                  <ul className="mt-4 space-y-2 text-sm leading-6 text-foreground/80">
+                    {weaknessesList.slice(0, 10).map((item, idx) => (
                       <li key={`${idx}-${item}`} className="flex gap-2">
-                        <span className="mt-[2px] text-foreground/60">
-                          ✖
-                        </span>
+                        <span className="mt-[2px] text-foreground/60">✖</span>
                         <span>{item}</span>
                       </li>
                     ))}
                   </ul>
                 ) : (
-                  <p className="mt-3 text-sm text-foreground/60">
-                    No cons listed.
-                  </p>
+                  <p className="mt-3 text-sm text-foreground/60">No cons listed.</p>
                 )}
               </div>
             </div>
-          </section>
-        ) : null}
 
-        {/* 4) Quick Facts | AI Insight (responsive 2-col) */}
-        {quickFacts.length > 0 || hasAnyInsight ? (
-          <section className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            {quickFacts.length > 0 ? (
-              <div className="rounded-3xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-moss/30 dark:bg-forest">
-                <header className="flex items-center justify-between gap-3">
-                  <h2 className="text-base font-semibold">Quick Facts</h2>
-                  <p className="text-xs text-foreground/60">
-                    Fast scan • {quickFacts.length} items
-                  </p>
-                </header>
-
-                <dl className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
-                  {quickFacts.map((f) => (
-                    <div
-                      key={f.key}
-                      className="rounded-2xl bg-white p-4 ring-1 ring-zinc-200/80 shadow-sm dark:bg-forest/60 dark:ring-moss/30"
-                    >
-                      <dt className="text-[11px] font-semibold uppercase tracking-wide text-foreground/60">
-                        {f.key}
-                      </dt>
-                      <dd className="mt-1 text-sm font-semibold text-foreground">
-                        {f.value}
-                      </dd>
-                    </div>
+            {bestForList.length > 0 ? (
+              <div className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-moss/30 dark:bg-forest/60">
+                <h3 className="text-base font-semibold">Best Use Case</h3>
+                <ul className="mt-4 space-y-2 text-sm leading-6 text-foreground/80">
+                  {bestForList.slice(0, 10).map((item, idx) => (
+                    <li key={`${idx}-${item}`} className="flex gap-2">
+                      <span className="mt-[2px] text-accent">•</span>
+                      <span>{item}</span>
+                    </li>
                   ))}
-                </dl>
-              </div>
-            ) : null}
-
-            {hasAnyInsight ? (
-              <div className="rounded-3xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-moss/30 dark:bg-forest">
-                <h2 className="text-base font-semibold">🤖 AI Insight</h2>
-                <p className="mt-1 text-xs leading-5 text-foreground/60">
-                  Key takeaways for quick decisions.
-                </p>
-
-                <div className="mt-4 space-y-4">
-                  {!aiSummaryLooksJson && fallbackAiSummary ? (
-                    <div>
-                      <h3 className="text-sm font-semibold">Summary</h3>
-                      <p className="mt-2 whitespace-pre-line text-sm leading-6 text-foreground/80">
-                        {fallbackAiSummary}
-                      </p>
-                    </div>
-                  ) : strengthsList.length > 0 ? (
-                    <div>
-                      <h3 className="text-sm font-semibold">Highlights</h3>
-                      <ul className="mt-2 list-disc space-y-1 pl-5 text-sm leading-6 text-foreground/80">
-                        {strengthsList.slice(0, 5).map((item, idx) => (
-                          <li key={`${idx}-${item}`}>{item}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  ) : tipsList.length > 0 ? (
-                    <div>
-                      <h3 className="text-sm font-semibold">Notes</h3>
-                      <p className="mt-2 text-sm leading-6 text-foreground/80">
-                        Tips are available below.
-                      </p>
-                    </div>
-                  ) : null}
-                </div>
+                </ul>
               </div>
             ) : null}
           </section>
         ) : null}
 
-        {/* 5) Tips (gear) */}
-        {isGear && tipsList.length > 0 ? (
-          <section className="rounded-3xl border border-zinc-200 bg-zinc-50 p-5 shadow-sm dark:border-moss/30 dark:bg-forest/60">
+        {/* Camping Tips */}
+        {tipsList.length > 0 ? (
+          <section aria-label="Camping tips" className="space-y-4">
             <header className="space-y-1">
-              <h2 className="text-base font-semibold">Camping Tips</h2>
-              <p className="text-xs leading-5 text-foreground/60">
-                Helpful reminders to get the most out of your setup.
+              <h2 className="text-xl font-semibold tracking-tight">Camping Tips</h2>
+              <p className="text-sm leading-6 text-foreground/60">
+                Actionable advice you can apply immediately.
               </p>
             </header>
 
-            <ul className="mt-4 list-disc space-y-1 pl-5 text-sm leading-6 text-foreground/80">
-              {tipsList.slice(0, 10).map((item, idx) => (
-                <li key={`${idx}-${item}`}>{item}</li>
-              ))}
+            <ul className="space-y-2 text-sm leading-6 text-foreground/80">
+              {tipsList
+                .map((t) =>
+                  t
+                    .replace(/^\s*(?:\d+\s*[).:\-]|[-*]|•|\u2022)\s+/i, "")
+                    .trim(),
+                )
+                .filter(Boolean)
+                .slice(0, 12)
+                .map((item, idx) => (
+                  <li key={`${idx}-${item}`} className="flex gap-2">
+                    <span className="mt-[2px] text-accent">•</span>
+                    <span>{item}</span>
+                  </li>
+                ))}
             </ul>
           </section>
         ) : null}
 
-        {/* 6) Affiliate CTA (gear) */}
-        {isGear ? (
-          <section className="rounded-3xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-moss/30 dark:bg-forest">
-            <h2 className="text-base font-semibold">Affiliate</h2>
-            <p className="mt-1 text-xs leading-5 text-foreground/60">
-              Optional links to buy or compare pricing.
-            </p>
-            <div className="mt-4">
-              <GearDetailActions recordId={id} title={title} />
-            </div>
-          </section>
-        ) : null}
+        {/* Actions */}
+        <section
+          aria-label="Actions"
+          className="border-t border-zinc-200 pt-8 dark:border-moss/30"
+        >
+          <GearDetailActions recordId={id} title={title} />
+        </section>
 
         {/* Raw review (hide on gear to match requested structure) */}
         {!isGear && rawReview ? (
