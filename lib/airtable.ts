@@ -38,6 +38,37 @@ export type AirtablePageResult<TFields extends Record<string, unknown>> = {
 
 const DEFAULT_MOCK_DATA_PATH = "mock/airtable.json";
 
+let didLogAirtableRuntimeInfo = false;
+
+function maskId(value: string, keepStart = 3, keepEnd = 3) {
+  const s = value.trim();
+  if (s.length <= keepStart + keepEnd) return "***";
+  return `${s.slice(0, keepStart)}***${s.slice(-keepEnd)}`;
+}
+
+function logAirtableRuntimeInfoOnce(params: {
+  op: "fetchPage" | "fetchRecord";
+  tableName: string;
+}) {
+  if (didLogAirtableRuntimeInfo) return;
+  didLogAirtableRuntimeInfo = true;
+
+  const apiKey = process.env.AIRTABLE_API_KEY;
+  const baseId = process.env.AIRTABLE_BASE_ID;
+  const mockPath = process.env.AIRTABLE_DATA_PATH;
+
+  // Intentionally do NOT log the API key value.
+  console.info("[airtable] runtime", {
+    op: params.op,
+    tableName: params.tableName,
+    mode: mockPath ? "mock" : "live",
+    hasApiKey: Boolean(apiKey),
+    hasBaseId: Boolean(baseId),
+    baseId: baseId ? maskId(baseId) : "",
+    mockPath: mockPath ? normalizePathForCompare(mockPath) : "",
+  });
+}
+
 function normalizePathForCompare(p: string) {
   return p.trim().replaceAll("\\\\", "/");
 }
@@ -61,7 +92,7 @@ function getAirtableConfig() {
 
   if (!apiKey || !baseId) {
     throw new Error(
-      "Missing Airtable env vars. Please set AIRTABLE_API_KEY and AIRTABLE_BASE_ID.",
+      "Missing Airtable env vars. Please set AIRTABLE_API_KEY and AIRTABLE_BASE_ID in your deployment environment.",
     );
   }
 
@@ -288,6 +319,8 @@ export async function fetchAirtableTablePage<TFields extends Record<string, unkn
 ): Promise<AirtablePageResult<TFields>> {
   const pageSize = params.pageSize ?? 10;
 
+  logAirtableRuntimeInfoOnce({ op: "fetchPage", tableName: params.tableName });
+
   // Mock mode: read from a local JSON file (no Airtable network calls).
   if (process.env.AIRTABLE_DATA_PATH) {
     return fetchMockTablePage<TFields>({
@@ -400,6 +433,7 @@ export async function fetchAirtableRecordById<
   tableName: string;
   recordId: string;
 }): Promise<AirtableRecord<TFields> | null> {
+  logAirtableRuntimeInfoOnce({ op: "fetchRecord", tableName: params.tableName });
   if (process.env.AIRTABLE_DATA_PATH) {
     return fetchMockRecordById<TFields>(params);
   }
