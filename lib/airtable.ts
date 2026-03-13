@@ -38,7 +38,7 @@ export type AirtablePageResult<TFields extends Record<string, unknown>> = {
 
 const DEFAULT_MOCK_DATA_PATH = "mock/airtable.json";
 
-let didLogAirtableRuntimeInfo = false;
+const didLogAirtableRuntimeInfoByOp = new Set<string>();
 
 function maskId(value: string, keepStart = 3, keepEnd = 3) {
   const s = value.trim();
@@ -50,8 +50,9 @@ function logAirtableRuntimeInfoOnce(params: {
   op: "fetchPage" | "fetchRecord";
   tableName: string;
 }) {
-  if (didLogAirtableRuntimeInfo) return;
-  didLogAirtableRuntimeInfo = true;
+  const key = `${params.op}:${params.tableName}`;
+  if (didLogAirtableRuntimeInfoByOp.has(key)) return;
+  didLogAirtableRuntimeInfoByOp.add(key);
 
   const apiKey = process.env.AIRTABLE_API_KEY;
   const baseId = process.env.AIRTABLE_BASE_ID;
@@ -374,6 +375,19 @@ export async function fetchAirtableTablePage<TFields extends Record<string, unkn
     filterByFormula,
   );
 
+  if (res.records.length > 0) {
+    console.info("[airtable] page", {
+      tableName: params.tableName,
+      page: currentPage,
+      records: res.records.length,
+      sampleRecordId: res.records[0]?.id,
+      sampleFieldKeys: Object.keys((res.records[0]?.fields as Record<string, unknown>) ?? {}).slice(
+        0,
+        20,
+      ),
+    });
+  }
+
   return {
     records: res.records,
     page: currentPage,
@@ -456,7 +470,13 @@ export async function fetchAirtableRecordById<
     });
 
     if (res.ok) {
-      return (await res.json()) as AirtableRecord<TFields>;
+      const record = (await res.json()) as AirtableRecord<TFields>;
+      console.info("[airtable] record", {
+        tableName: params.tableName,
+        recordId: record.id,
+        fieldKeys: Object.keys((record.fields as Record<string, unknown>) ?? {}).slice(0, 50),
+      });
+      return record;
     }
 
     // Record not found.
