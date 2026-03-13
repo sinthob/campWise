@@ -474,6 +474,64 @@ function parseCampingTipsJson(raw: string | undefined | null): {
   }
 }
 
+function extractSummaryFromJsonString(raw: string): string {
+  const fromTips = parseCampingTipsJson(raw);
+  if (fromTips?.summaryText) return fromTips.summaryText;
+
+  const trimmed = raw.trim();
+  if (!trimmed) return "";
+  if (!(trimmed.startsWith("{") || trimmed.startsWith("["))) return "";
+
+  try {
+    const parsed = JSON.parse(trimmed) as unknown;
+
+    if (typeof parsed === "string") return parsed.trim();
+
+    if (Array.isArray(parsed)) {
+      const parts = parsed
+        .flatMap((v) => (typeof v === "string" ? [v.trim()] : []))
+        .filter(Boolean);
+      return parts.join("\n").trim();
+    }
+
+    if (!parsed || typeof parsed !== "object") return "";
+
+    const candidateKeys = [
+      "overview",
+      "summary",
+      "summaryText",
+      "aiSummary",
+      "ai_summary",
+      "verdict",
+      "aiVerdict",
+      "description",
+      "text",
+      "content",
+    ];
+
+    const obj = parsed as Record<string, unknown>;
+    for (const key of candidateKeys) {
+      const v = obj[key];
+      if (typeof v === "string" && v.trim().length > 0) return v.trim();
+    }
+
+    for (const containerKey of ["data", "result", "output", "meta", "insight"]) {
+      const container = obj[containerKey];
+      if (!container || typeof container !== "object" || Array.isArray(container)) continue;
+
+      const nested = container as Record<string, unknown>;
+      for (const key of candidateKeys) {
+        const v = nested[key];
+        if (typeof v === "string" && v.trim().length > 0) return v.trim();
+      }
+    }
+  } catch {
+    return "";
+  }
+
+  return "";
+}
+
 type HackGuideStep = {
   title: string;
   body?: string;
@@ -763,6 +821,10 @@ export default async function DynamicDetailPage(props: {
       !!aiSummaryTrimmed &&
       (aiSummaryTrimmed.startsWith("{") || aiSummaryTrimmed.startsWith("["));
 
+    const aiSummaryForCard = aiSummaryLooksJson
+      ? extractSummaryFromJsonString(aiSummaryText)
+      : aiSummaryText;
+
     const roadmapOneDay = toMultilineStringFromUnknown(
       record.fields["Roadmap Guide one day"],
     );
@@ -853,7 +915,7 @@ export default async function DynamicDetailPage(props: {
       value: string;
     }>;
 
-    const bestSeasonMonthsRaw = pickString(record.fields, [
+    const bestSeasonMonthsRaw = pickValue(record.fields, [
       "Best Season",
       "Best Months",
       "Best time to visit",
@@ -965,13 +1027,33 @@ export default async function DynamicDetailPage(props: {
               <HeroGallery title={title} images={images} />
 
               <HeroInfoHighlights
-
-                bestTimeText={pickString(record.fields, ["BestTime"]) || bestSeasonMonthsRaw}
-
-                highlightText={pickString(record.fields, ["Highlight"]) || highlightFogText}
-
-                warningText={pickString(record.fields, ["warning", "Warning", "Warnings"])}
-
+                bestTimeText={
+                  pickValue(record.fields, [
+                    "BestTime",
+                    "Best Time",
+                    "Best time",
+                    "Best time to visit",
+                    "Best Season",
+                    "Best Months",
+                  ]) || bestSeasonMonthsRaw
+                }
+                highlightText={
+                  pickValue(record.fields, [
+                    "Highlight",
+                    "Highlights",
+                    "Highlight Facts",
+                    "Highlight Fact",
+                  ]) || highlightFogText
+                }
+                warningText={
+                  pickValue(record.fields, [
+                    "warning",
+                    "Warning",
+                    "Warnings",
+                    "Caution",
+                    "ข้อควรระวัง",
+                  ])
+                }
               />
 
               <RecommendedGearCards
@@ -985,7 +1067,7 @@ export default async function DynamicDetailPage(props: {
                 badgeLabel={cfg.badge}
                 title={title}
                 location={location}
-                aiSummary={aiSummaryLooksJson ? undefined : aiSummaryText}
+                aiSummary={aiSummaryForCard}
                 quickInfo={<QuickInfoBar items={quickInfoItems} />}
                 actions={
                   <HeroActions recordId={id} title={title} mapsUrl={mapsUrl} />
