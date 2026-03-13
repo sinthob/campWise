@@ -1194,6 +1194,20 @@ export default async function DynamicDetailPage(props: {
 
     const heroSummary = guide.summary || heroDescriptionText;
 
+    const gearNeedItems = toStringListFromUnknown(
+      record.fields["Gear Need"] ??
+        record.fields["Gear need"] ??
+        record.fields["Gear Needed"] ??
+        record.fields["Gear needs"],
+    );
+
+    const commonMistakesItems = toStringListFromUnknown(
+      record.fields["Common Mistakes"] ??
+        record.fields["Common mistakes"] ??
+        record.fields["Common Mistake"] ??
+        record.fields["Mistakes"],
+    );
+
     const recommendedGearRaw =
       record.fields["Recommended Gear"] ??
       record.fields["Recommended gear"] ??
@@ -1308,67 +1322,46 @@ export default async function DynamicDetailPage(props: {
             )}
           </section>
 
-          {/* Step-by-step Guide */}
+          {/* Gear Need */}
           <section className="rounded-3xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-moss/30 dark:bg-forest">
             <header className="space-y-1">
-              <h2 className="text-base font-semibold">Step-by-step Guide</h2>
+              <h2 className="text-base font-semibold">Gear Need</h2>
               <p className="text-xs leading-5 text-foreground/60">
-                Follow these steps in order.
+                Items that help you do this tip.
               </p>
             </header>
 
-            {guide.steps.length > 0 ? (
-              <ol className="mt-4 space-y-3">
-                {guide.steps.slice(0, 8).map((step, idx) => (
-                  <li
-                    key={`${idx}-${step.title}`}
-                    className="rounded-2xl bg-white p-4 ring-1 ring-zinc-200/80 shadow-sm dark:bg-forest/60 dark:ring-moss/30"
-                  >
-                    <div className="flex gap-4">
-                      <div className="flex h-9 w-9 flex-none items-center justify-center rounded-full bg-zinc-100 text-sm font-semibold text-zinc-900 ring-1 ring-zinc-200 dark:bg-moss/40 dark:text-sand dark:ring-moss/40">
-                        {idx + 1}
-                      </div>
-
-                      <div className="min-w-0">
-                        <h3 className="text-sm font-semibold">{step.title}</h3>
-                        {step.body ? (
-                          <p className="mt-1 whitespace-pre-line text-sm leading-6 text-foreground/70">
-                            {step.body}
-                          </p>
-                        ) : null}
-                      </div>
-                    </div>
-                  </li>
-                ))}
-              </ol>
-            ) : (
-              <p className="mt-4 text-sm leading-6 text-foreground/60">
-                No steps available yet.
-              </p>
-            )}
-          </section>
-
-          {/* Pro Tips */}
-          <section className="rounded-3xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-moss/30 dark:bg-forest">
-            <header className="space-y-1">
-              <h2 className="text-base font-semibold">Pro Tips</h2>
-              <p className="text-xs leading-5 text-foreground/60">
-                Extra advice that makes the difference.
-              </p>
-            </header>
-
-            {guide.proTips.length > 0 ? (
-              <ul className="mt-4 space-y-2 text-sm leading-6 text-foreground/80">
-                {guide.proTips.slice(0, 8).map((item, idx) => (
-                  <li key={`${idx}-${item}`} className="flex gap-2">
-                    <span className="mt-[2px] text-accent">เนโฌเธ</span>
-                    <span>{item}</span>
-                  </li>
+            {gearNeedItems.length > 0 ? (
+              <ul className="mt-4 list-disc space-y-2 pl-5 text-sm leading-6 text-foreground/80">
+                {gearNeedItems.slice(0, 10).map((item, idx) => (
+                  <li key={`${idx}-${item}`}>{item}</li>
                 ))}
               </ul>
             ) : (
               <p className="mt-4 text-sm leading-6 text-foreground/60">
-                No pro tips available yet.
+                No gear listed yet.
+              </p>
+            )}
+          </section>
+
+          {/* Common Mistakes */}
+          <section className="rounded-3xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-moss/30 dark:bg-forest">
+            <header className="space-y-1">
+              <h2 className="text-base font-semibold">Common Mistakes</h2>
+              <p className="text-xs leading-5 text-foreground/60">
+                Pitfalls to avoid when applying this tip.
+              </p>
+            </header>
+
+            {commonMistakesItems.length > 0 ? (
+              <ul className="mt-4 list-disc space-y-2 pl-5 text-sm leading-6 text-foreground/80">
+                {commonMistakesItems.slice(0, 10).map((item, idx) => (
+                  <li key={`${idx}-${item}`}>{item}</li>
+                ))}
+              </ul>
+            ) : (
+              <p className="mt-4 text-sm leading-6 text-foreground/60">
+                No mistakes listed yet.
               </p>
             )}
           </section>
