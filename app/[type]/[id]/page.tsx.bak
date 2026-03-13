@@ -262,7 +262,7 @@ function toStringListFromUnknown(value: unknown): string[] {
 
   // Split on newlines and common bullet prefixes.
   const parts = normalized
-    .split(/\n|เน€เธยเนยเธเน€เธย|\u2022/g)
+    .split(/\n|•|\u2022/g)
     .flatMap((p) => p.split(/^\s*[-*]\s*/m))
     .map((p) => p.trim())
     .filter(Boolean);
@@ -376,7 +376,7 @@ function parseMonthBadges(raw: string): string[] {
   if (!normalized) return [];
 
   const parts = normalized
-    .split(/\n|,|\/|\u2022|เน€เธยเนยเธเน€เธย/g)
+    .split(/\n|,|\/|\u2022|•/g)
     .map((p) => p.trim())
     .filter(Boolean);
 
@@ -483,7 +483,7 @@ function toExcerpt(raw: string, maxChars: number): string {
   const s = raw.replace(/\s+/g, " ").trim();
   if (!s) return "";
   if (s.length <= maxChars) return s;
-  return `${s.slice(0, Math.max(0, maxChars - 1)).trimEnd()}เน€เธยเนยเธเน€เธย`;
+  return `${s.slice(0, Math.max(0, maxChars - 1)).trimEnd()}…`;
 }
 
 function splitParagraphs(raw: string): string[] {
@@ -502,7 +502,7 @@ function extractBulletLines(raw: string): string[] {
   for (const line of lines) {
     const trimmed = line.trim();
     if (!trimmed) continue;
-    const m = trimmed.match(/^(?:[-*]|เน€เธยเนยเธเน€เธย|\u2022)\s+(.*)$/);
+    const m = trimmed.match(/^(?:[-*]|•|\u2022)\s+(.*)$/);
     if (m?.[1]) out.push(m[1].trim());
   }
 
@@ -569,7 +569,7 @@ function parseGuideSections(raw: string): {
   const normalizeHeading = (s: string) =>
     s
       .replace(/^#+\s*/, "")
-      .replace(/[:เน€เธยเน€เธยเธขย]$/, "")
+      .replace(/[:：]$/, "")
       .trim()
       .toLowerCase();
 
@@ -726,7 +726,7 @@ export default async function DynamicDetailPage(props: {
             href={cfg.listHref}
             className="text-sm font-medium text-foreground/80 hover:text-accent"
           >
-            เน€เธยเธขยเธขย Back
+            ← Back
           </Link>
 
           <h1 className="mt-6 text-2xl font-semibold tracking-tight">
@@ -794,54 +794,80 @@ export default async function DynamicDetailPage(props: {
         "Temp Range",
       ]) || toShortStringFromUnknown(record.fields["Night temperature range"]);
 
+    const rainySeasonValue =
+      record.fields["Rainy season"] ??
+      record.fields["Rainy Season"] ??
+      record.fields["Rain season"] ??
+      record.fields["Rain Season"];
+    const rainySeasonText =
+      typeof rainySeasonValue === "boolean"
+        ? rainySeasonValue
+          ? "แนะนำ"
+          : "ไม่แนะนำ"
+        : toShortStringFromUnknown(rainySeasonValue);
+
+    const elevationValue =
+      record.fields["Elevation"] ??
+      record.fields["Elevation (m)"] ??
+      record.fields["Altitude"] ??
+      record.fields["Altitude (m)"] ??
+      record.fields["ความสูง"];
+    const elevationTextRaw = toShortStringFromUnknown(elevationValue);
+    const elevationText = elevationTextRaw
+      ? /m\b/i.test(elevationTextRaw)
+        ? elevationTextRaw
+        : `${elevationTextRaw}m`
+      : "";
+
     const highlightFactsRaw =
       record.fields["Highlight Facts"] ??
       record.fields["Highlights"] ??
       record.fields["Highlight"] ??
-      record.fields["เน€เธโฌเน€เธยเธขยเน€เธโฌเน€เธยเน€เธยเน€เธโฌเน€เธยเนโฌยเน€เธโฌเน€เธยเนยเธเน€เธโฌเน€เธยเนโฌยเน€เธโฌเน€เธยเธขยเน€เธโฌเน€เธยเธขย"];
+      record.fields["จุดเด่น"];
     const highlightFacts = toStringListFromUnknown(highlightFactsRaw);
     const highlightFogText = highlightFacts[0];
+    const highlightSunriseText = highlightFacts[1];
 
     const quickInfoItems = [
-      location ? { icon: "เน€เธยเธขยเนโฌยเธขย", label: "Location", value: location } : null,
+      location ? { icon: "📍", label: "Location", value: location } : null,
       {
-        icon: "เน€เธยเธขยเธขยเนโฌโ€",
+        icon: "🚗",
         label: "Travel time",
         value: travelTimeText,
       },
       {
-        icon: "เน€เธยเธขยเธขยเน€เธย",
+        icon: "🌡",
         label: "Night temp",
         value: nightTempText,
       },
       {
-        icon: "เน€เธยเธขยเน€เธย",
+        icon: "⛺",
         label: "Camping",
         value: toShortStringFromUnknown(
           record.fields["Camping allowed"] ?? record.fields["Camping Allowed"],
         ),
       },
       {
-        icon: "เน€เธยเธขยเธขยเน€เธย",
+        icon: "🚻",
         label: "Toilet",
         value: toShortStringFromUnknown(
           record.fields["Toilet availability"] ?? record.fields["Toilet"],
         ),
       },
       {
-        icon: "เน€เธยเธขยเน€เธย",
+        icon: "⚡",
         label: "Electricity",
         value: toShortStringFromUnknown(record.fields["Electricity"]),
       },
       {
-        icon: "เน€เธยเธขยเนโฌยเน€เธโ€“",
+        icon: "📶",
         label: "Signal",
         value: toShortStringFromUnknown(
           record.fields["Signal strength"] ?? record.fields["Signal"],
         ),
       },
       {
-        icon: "เน€เธยเน€เธยเธขย",
+        icon: "⭐",
         label: "Difficulty",
         value: toShortStringFromUnknown(
           record.fields["Difficulty level"] ?? record.fields["Difficulty"],
@@ -879,7 +905,7 @@ export default async function DynamicDetailPage(props: {
       record.fields["Packing List"];
     const gearItems = toStringListFromUnknown(gearSuggestionRaw);
 
-    // Recommended gear types (AI-filled): e.g. "เน€เธโฌเน€เธยเน€เธยเน€เธโฌเน€เธยเน€เธยเน€เธโฌเน€เธยเธขยเน€เธโฌเน€เธยเธขยเน€เธโฌเน€เธยเน€เธยเน€เธโฌเน€เธยเนโฌยเน€เธโฌเน€เธยเธขยเน€เธโฌเน€เธยเธขยเน€เธโฌเน€เธยเน€เธโ€เน€เธโฌเน€เธยเธขยเน€เธโฌเน€เธยเน€เธยเน€เธโฌเน€เธยเธขยเน€เธโฌเน€เธยเน€เธโ€เน€เธโฌเน€เธยเน€เธย", "เน€เธโฌเน€เธยเนยเธเน€เธโฌเน€เธยเนโฌเธเน€เธโฌเน€เธยเธขยเน€เธโฌเน€เธยเธขยเน€เธโฌเน€เธยเนโฌโ€เน€เธโฌเน€เธยเธขย".
+    // Recommended gear types (AI-filled): e.g. "อุปกรณ์กันหนาว", "เต็นท์".
     const recommendedGearTypesRaw =
       record.fields["Recommended Gear"] ??
       record.fields["Recommended Gear Types"] ??
@@ -956,7 +982,7 @@ export default async function DynamicDetailPage(props: {
               href={cfg.listHref}
               className="text-sm font-medium text-slate-700 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent dark:text-sand/80 dark:hover:text-accent"
             >
-              เน€เธยเธขยเธขย Back
+              ← Back
             </Link>
           </nav>
 
@@ -965,13 +991,15 @@ export default async function DynamicDetailPage(props: {
               <HeroGallery title={title} images={images} />
 
               <HeroInfoHighlights
-
-                bestTimeText={pickString(record.fields, ["BestTime"]) || bestSeasonMonthsRaw}
-
-                highlightText={pickString(record.fields, ["Highlight"]) || highlightFogText}
-
-                warningText={pickString(record.fields, ["warning", "Warning", "Warnings"])}
-
+                bestMonths={bestSeasonMonths}
+                bestPeriodText={bestSeasonMonthsRaw}
+                rainySeasonText={rainySeasonText}
+                nightTempText={nightTempText}
+                rating={bestSeasonRating}
+                elevationText={elevationText}
+                highlightFogText={highlightFogText}
+                highlightSunriseText={highlightSunriseText}
+                travelTimeText={travelTimeText}
               />
 
               <RecommendedGearCards
@@ -1009,13 +1037,13 @@ export default async function DynamicDetailPage(props: {
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <TripTimeline
                 title="1 Day 1 Night"
-                intro="Recommended for weekends เน€เธยเนยเธเนโฌย a compact plan that still feels complete."
+                intro="Recommended for weekends — a compact plan that still feels complete."
                 planText={roadmapOneDay}
               />
 
               <TripTimeline
                 title="2 Days 2 Nights"
-                intro="Recommended for longer breaks เน€เธยเนยเธเนโฌย slower pace, more activities."
+                intro="Recommended for longer breaks — slower pace, more activities."
                 planText={roadmapTwoDay}
               />
             </div>
@@ -1115,7 +1143,7 @@ export default async function DynamicDetailPage(props: {
     const raw = (fallbackAiSummary ?? "").replace(/\r/g, "").trim();
     if (!raw) return "";
 
-    // Prefer 1เน€เธยเนยเธเนโฌย2 short sentences.
+    // Prefer 1–2 short sentences.
     const normalized = raw.replace(/\s+/g, " ");
     const sentences = normalized
       .split(/(?<=[.!?])\s+/)
@@ -1183,7 +1211,7 @@ export default async function DynamicDetailPage(props: {
         const id = m[0];
         const label = token
           .replace(id, "")
-          .replace(/[()\-เน€เธยเนยเธเนโฌยเน€เธยเนยเธเนโฌย:]+/g, " ")
+          .replace(/[()\-–—:]+/g, " ")
           .trim();
         return { id, label: label || "Gear item" };
       })
@@ -1196,7 +1224,7 @@ export default async function DynamicDetailPage(props: {
             href={cfg.listHref}
             className="text-sm font-medium text-foreground/80 hover:text-accent"
           >
-            เน€เธยเธขยเธขย Back
+            ← Back
           </Link>
 
           {/* Hero */}
@@ -1333,7 +1361,7 @@ export default async function DynamicDetailPage(props: {
               <ul className="mt-4 space-y-2 text-sm leading-6 text-foreground/80">
                 {guide.proTips.slice(0, 8).map((item, idx) => (
                   <li key={`${idx}-${item}`} className="flex gap-2">
-                    <span className="mt-[2px] text-accent">เน€เธยเนยเธเน€เธย</span>
+                    <span className="mt-[2px] text-accent">•</span>
                     <span>{item}</span>
                   </li>
                 ))}
@@ -1380,7 +1408,7 @@ export default async function DynamicDetailPage(props: {
           href={cfg.listHref}
           className="text-sm font-medium text-foreground/80 hover:text-accent"
         >
-          เน€เธยเธขยเธขย Back
+          ← Back
         </Link>
 
         {/* Hero: image + product summary */}
@@ -1388,7 +1416,7 @@ export default async function DynamicDetailPage(props: {
           <div className="p-6">
             {createdDateText ? (
               <div className="flex justify-end text-xs font-medium text-foreground/60">
-                เน€เธโฌเน€เธยเนยเธเน€เธโฌเน€เธยเธขยเน€เธโฌเน€เธยเน€เธโ€เน€เธโฌเน€เธยเธขยเน€เธโฌเน€เธยเน€เธยเน€เธโฌเน€เธยเธขยเน€เธโฌเน€เธยเธขยเน€เธโฌเน€เธยเน€เธยเน€เธโฌเน€เธยเน€เธยเน€เธโฌเน€เธยเน€เธยเน€เธโฌเน€เธยเน€เธโ€ฆเน€เธโฌเน€เธยเนยเธเน€เธโฌเน€เธยเน€เธยเน€เธโฌเน€เธยเน€เธโ€”เน€เธโฌเน€เธยเธขยเน€เธโฌเน€เธยเน€เธย {createdDateText}
+                เพิ่มข้อมูลเมื่อ {createdDateText}
               </div>
             ) : null}
 
@@ -1447,21 +1475,21 @@ export default async function DynamicDetailPage(props: {
 
                 const attrs = [
                   capacityText
-                    ? { icon: "เน€เธยเธขยเนโฌยเน€เธโ€ฆ", label: "Capacity", value: capacityText }
+                    ? { icon: "👥", label: "Capacity", value: capacityText }
                     : null,
                   categoryText || location
                     ? {
-                        icon: "เน€เธยเธขยเน€เธยเน€เธย",
+                        icon: "🧭",
                         label: "Category",
                         value: categoryText || location,
                       }
                     : null,
                   weightText
-                    ? { icon: "เน€เธยเธขยเนโฌโ€", label: "Weight", value: weightText }
+                    ? { icon: "⚖", label: "Weight", value: weightText }
                     : null,
                   weatherSuitabilityText
                     ? {
-                        icon: "เน€เธยเธขยเธขย",
+                        icon: "☁",
                         label: "Weather",
                         value: weatherSuitabilityText,
                       }
@@ -1615,21 +1643,21 @@ export default async function DynamicDetailPage(props: {
           }
 
           return (
-            <section aria-label="เน€เธโฌเน€เธยเน€เธยเน€เธโฌเน€เธยเน€เธโ€เน€เธโฌเน€เธยเน€เธยเน€เธโฌเน€เธยเน€เธโ€ฆเน€เธโฌเน€เธยเน€เธยเน€เธโฌเน€เธยเนยเธเน€เธโฌเน€เธยเน€เธยเน€เธโฌเน€เธยเน€เธโ€ขเน€เธโฌเน€เธยเน€เธยเน€เธโฌเน€เธยเนโฌยเน€เธโฌเน€เธยเนยเธเน€เธโฌเน€เธยเธขยเน€เธโฌเน€เธยเน€เธโ€เน€เธโฌเน€เธยเธขยเน€เธโฌเน€เธยเน€เธยเน€เธโฌเน€เธยเนยเธเน€เธโฌเน€เธยเนโฌเธเน€เธโฌเน€เธยเน€เธโ€เน€เธโฌเน€เธยเน€เธย" className="mt-16 space-y-6">
+            <section aria-label="รายละเอียดเพิ่มเติม" className="mt-16 space-y-6">
               <header className="space-y-1">
                 <h2 className="text-xl font-semibold tracking-tight">
-                  เน€เธโฌเน€เธยเน€เธยเน€เธโฌเน€เธยเน€เธโ€เน€เธโฌเน€เธยเน€เธยเน€เธโฌเน€เธยเน€เธโ€ฆเน€เธโฌเน€เธยเน€เธยเน€เธโฌเน€เธยเนยเธเน€เธโฌเน€เธยเน€เธยเน€เธโฌเน€เธยเน€เธโ€ขเน€เธโฌเน€เธยเน€เธยเน€เธโฌเน€เธยเนโฌยเน€เธโฌเน€เธยเนยเธเน€เธโฌเน€เธยเธขยเน€เธโฌเน€เธยเน€เธโ€เน€เธโฌเน€เธยเธขยเน€เธโฌเน€เธยเน€เธยเน€เธโฌเน€เธยเนยเธเน€เธโฌเน€เธยเนโฌเธเน€เธโฌเน€เธยเน€เธโ€เน€เธโฌเน€เธยเน€เธย
+                  รายละเอียดเพิ่มเติม
                 </h2>
               </header>
 
               <div className="grid gap-8 md:grid-cols-2">
                 <div className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-moss/30 dark:bg-forest/60">
-                  <h3 className="text-base font-semibold">เน€เธโฌเน€เธยเธขยเน€เธโฌเน€เธยเธขยเน€เธโฌเน€เธยเน€เธยเน€เธโฌเน€เธยเนโฌยเน€เธโฌเน€เธยเน€เธโ€ข</h3>
+                  <h3 className="text-base font-semibold">ข้อดี</h3>
                   {pros.length > 0 ? (
                     <ul className="mt-4 space-y-2 text-sm leading-6 text-foreground/80">
                       {pros.slice(0, 10).map((item, idx) => (
                         <li key={`${idx}-${item}`} className="flex gap-2">
-                          <span className="mt-[2px] text-accent">เน€เธยเนยเธเน€เธย</span>
+                          <span className="mt-[2px] text-accent">•</span>
                           <span>{item}</span>
                         </li>
                       ))}
@@ -1642,12 +1670,12 @@ export default async function DynamicDetailPage(props: {
                 </div>
 
                 <div className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-moss/30 dark:bg-forest/60">
-                  <h3 className="text-base font-semibold">เน€เธโฌเน€เธยเธขยเน€เธโฌเน€เธยเธขยเน€เธโฌเน€เธยเน€เธยเน€เธโฌเน€เธยเธขยเน€เธโฌเน€เธยเน€เธโ€เน€เธโฌเน€เธยเธขยเน€เธโฌเน€เธยเน€เธโ€เน€เธโฌเน€เธยเนโฌย</h3>
+                  <h3 className="text-base font-semibold">ข้อจำกัด</h3>
                   {cons.length > 0 ? (
                     <ul className="mt-4 space-y-2 text-sm leading-6 text-foreground/80">
                       {cons.slice(0, 10).map((item, idx) => (
                         <li key={`${idx}-${item}`} className="flex gap-2">
-                          <span className="mt-[2px] text-foreground/60">เน€เธยเนยเธเน€เธย</span>
+                          <span className="mt-[2px] text-foreground/60">•</span>
                           <span>{item}</span>
                         </li>
                       ))}
@@ -1662,11 +1690,11 @@ export default async function DynamicDetailPage(props: {
 
               {useCases.length > 0 ? (
                 <div className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-moss/30 dark:bg-forest/60">
-                  <h3 className="text-base font-semibold">เน€เธโฌเน€เธยเนยเธเน€เธโฌเน€เธยเน€เธยเน€เธโฌเน€เธยเน€เธยเน€เธโฌเน€เธยเน€เธโ€เน€เธโฌเน€เธยเน€เธยเน€เธโฌเน€เธยเน€เธยเน€เธโฌเน€เธยเน€เธโ€เน€เธโฌเน€เธยเน€เธยเน€เธโฌเน€เธยเน€เธยเน€เธโฌเน€เธยเน€เธโ€เน€เธโฌเน€เธยเธขย</h3>
+                  <h3 className="text-base font-semibold">เหมาะสำหรับ</h3>
                   <ul className="mt-4 space-y-2 text-sm leading-6 text-foreground/80">
                     {useCases.slice(0, 12).map((item, idx) => (
                       <li key={`${idx}-${item}`} className="flex gap-2">
-                        <span className="mt-[2px] text-accent">เน€เธยเนยเธเน€เธย</span>
+                        <span className="mt-[2px] text-accent">•</span>
                         <span>{item}</span>
                       </li>
                     ))}
@@ -1690,7 +1718,7 @@ export default async function DynamicDetailPage(props: {
           <section className="rounded-2xl border border-zinc-200 bg-white p-6 text-foreground shadow-sm dark:border-moss/30 dark:bg-forest dark:text-sand">
             <details className="group">
               <summary className="cursor-pointer list-none text-base font-semibold">
-                เน€เธยเธขยเนโฌยเธขย Raw review
+                📝 Raw review
                 <span className="ml-2 text-sm font-medium text-accent">
                   (click to {"open"})
                 </span>
