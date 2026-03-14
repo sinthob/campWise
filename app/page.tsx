@@ -1,35 +1,14 @@
 import Link from "next/link";
 
 import { getHomeCardImages } from "@/lib/home-card-images";
+import { getHomeRecommendedSpots } from "@/lib/home-recommended-spots";
 
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
   const homeCardImages = await getHomeCardImages();
 
-  const recommendedSpots = [
-    {
-      title: "Saraburi River Side",
-      rating: 4.8,
-      pricePerNight: "฿890/night",
-      imageUrl:
-        "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80",
-    },
-    {
-      title: "Khao Yai Pine Camp",
-      rating: 4.6,
-      pricePerNight: "฿1,250/night",
-      imageUrl:
-        "https://images.unsplash.com/photo-1487730116645-74489c95b41b?auto=format&fit=crop&w=1600&q=80",
-    },
-    {
-      title: "Chiang Mai Mist Valley",
-      rating: 4.9,
-      pricePerNight: "฿1,490/night",
-      imageUrl:
-        "https://images.unsplash.com/photo-1520962917969-357b3f4f25b6?auto=format&fit=crop&w=1600&q=80",
-    },
-  ];
+  const recommendedSpots = await getHomeRecommendedSpots(3);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -227,9 +206,7 @@ export default async function Home() {
               );
               const emptyStars = 5 - filledStars;
 
-              const qs = new URLSearchParams();
-              qs.set("q", spot.title);
-              const detailHref = `/campgrounds?${qs.toString()}`;
+              const detailHref = `/campground/${spot.id}`;
 
               return (
                 <div
@@ -239,7 +216,9 @@ export default async function Home() {
                   <div
                     className="aspect-video w-full bg-slate-100 dark:bg-white/5"
                     style={{
-                      backgroundImage: `url(${spot.imageUrl})`,
+                      backgroundImage: spot.imageUrl
+                        ? `url(${spot.imageUrl})`
+                        : undefined,
                       backgroundSize: "cover",
                       backgroundPosition: "center",
                     }}
