@@ -1,6 +1,12 @@
 import Link from "next/link";
 
-export default function Home() {
+import { getHomeCardImages } from "@/lib/home-card-images";
+
+export const dynamic = "force-dynamic";
+
+export default async function Home() {
+  const homeCardImages = await getHomeCardImages();
+
   const recommendedSpots = [
     {
       title: "Saraburi River Side",
@@ -82,10 +88,31 @@ export default function Home() {
             href="/campgrounds"
             className="group overflow-hidden rounded-2xl border border-slate-200/60 bg-white/5 shadow-sm backdrop-blur-xl transition-all duration-300 hover:scale-[1.02] hover:border-primary/40 hover:shadow-xl dark:border-white/10"
           >
-            <div className="aspect-video w-full bg-slate-100 dark:bg-white/5">
-              <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-200/60 to-slate-100/30 text-sm font-semibold tracking-wide text-slate-700/80 dark:from-white/10 dark:to-white/5 dark:text-white/70">
-                Campgrounds
-              </div>
+            <div className="relative aspect-video w-full overflow-hidden bg-slate-100 dark:bg-white/5">
+              {homeCardImages.campgrounds ? (
+                <>
+                  <div
+                    className="absolute inset-0"
+                    style={{
+                      backgroundImage: `url(${homeCardImages.campgrounds})`,
+                      backgroundSize: "cover",
+                      backgroundPosition: "center",
+                    }}
+                    aria-hidden="true"
+                  />
+                  <div
+                    className="absolute inset-0 bg-slate-950/35"
+                    aria-hidden="true"
+                  />
+                  <div className="relative flex h-full w-full items-center justify-center text-sm font-semibold tracking-wide text-white/90">
+                    Campgrounds
+                  </div>
+                </>
+              ) : (
+                <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-200/60 to-slate-100/30 text-sm font-semibold tracking-wide text-slate-700/80 dark:from-white/10 dark:to-white/5 dark:text-white/70">
+                  Campgrounds
+                </div>
+              )}
             </div>
 
             <div className="p-6">
@@ -102,10 +129,31 @@ export default function Home() {
             href="/gear-lists"
             className="group overflow-hidden rounded-2xl border border-slate-200/60 bg-white/5 shadow-sm backdrop-blur-xl transition-all duration-300 hover:scale-[1.02] hover:border-primary/40 hover:shadow-xl dark:border-white/10"
           >
-            <div className="aspect-video w-full bg-slate-100 dark:bg-white/5">
-              <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-200/60 to-slate-100/30 text-sm font-semibold tracking-wide text-slate-700/80 dark:from-white/10 dark:to-white/5 dark:text-white/70">
-                Gear Lists
-              </div>
+            <div className="relative aspect-video w-full overflow-hidden bg-slate-100 dark:bg-white/5">
+              {homeCardImages.gearLists ? (
+                <>
+                  <div
+                    className="absolute inset-0"
+                    style={{
+                      backgroundImage: `url(${homeCardImages.gearLists})`,
+                      backgroundSize: "cover",
+                      backgroundPosition: "center",
+                    }}
+                    aria-hidden="true"
+                  />
+                  <div
+                    className="absolute inset-0 bg-slate-950/35"
+                    aria-hidden="true"
+                  />
+                  <div className="relative flex h-full w-full items-center justify-center text-sm font-semibold tracking-wide text-white/90">
+                    Gear Lists
+                  </div>
+                </>
+              ) : (
+                <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-200/60 to-slate-100/30 text-sm font-semibold tracking-wide text-slate-700/80 dark:from-white/10 dark:to-white/5 dark:text-white/70">
+                  Gear Lists
+                </div>
+              )}
             </div>
 
             <div className="p-6">
@@ -122,10 +170,31 @@ export default function Home() {
             href="/camping-hacks"
             className="group overflow-hidden rounded-2xl border border-slate-200/60 bg-white/5 shadow-sm backdrop-blur-xl transition-all duration-300 hover:scale-[1.02] hover:border-primary/40 hover:shadow-xl dark:border-white/10"
           >
-            <div className="aspect-video w-full bg-slate-100 dark:bg-white/5">
-              <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-200/60 to-slate-100/30 text-sm font-semibold tracking-wide text-slate-700/80 dark:from-white/10 dark:to-white/5 dark:text-white/70">
-                Tips &amp; Hacks
-              </div>
+            <div className="relative aspect-video w-full overflow-hidden bg-slate-100 dark:bg-white/5">
+              {homeCardImages.tips ? (
+                <>
+                  <div
+                    className="absolute inset-0"
+                    style={{
+                      backgroundImage: `url(${homeCardImages.tips})`,
+                      backgroundSize: "cover",
+                      backgroundPosition: "center",
+                    }}
+                    aria-hidden="true"
+                  />
+                  <div
+                    className="absolute inset-0 bg-slate-950/35"
+                    aria-hidden="true"
+                  />
+                  <div className="relative flex h-full w-full items-center justify-center text-sm font-semibold tracking-wide text-white/90">
+                    Tips &amp; Hacks
+                  </div>
+                </>
+              ) : (
+                <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-200/60 to-slate-100/30 text-sm font-semibold tracking-wide text-slate-700/80 dark:from-white/10 dark:to-white/5 dark:text-white/70">
+                  Tips &amp; Hacks
+                </div>
+              )}
             </div>
 
             <div className="p-6">

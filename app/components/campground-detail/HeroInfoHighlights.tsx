@@ -40,7 +40,9 @@ export default function HeroInfoHighlights(props: HeroInfoHighlightsProps) {
   const derivedBestTimeText = joinLines([
     props.bestTimeText,
     bestMonthsText ? `Best months: ${bestMonthsText}` : null,
-    typeof props.rating === "number" ? `Season score: ${props.rating.toFixed(1)}/5` : null,
+    typeof props.rating === "number"
+      ? `Season score: ${props.rating.toFixed(1)}/5`
+      : null,
   ]);
 
   const derivedHighlightText = joinLines([
