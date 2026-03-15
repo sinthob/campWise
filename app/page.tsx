@@ -200,12 +200,6 @@ export default async function Home() {
 
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
             {recommendedSpots.map((spot) => {
-              const filledStars = Math.max(
-                0,
-                Math.min(5, Math.floor(spot.rating)),
-              );
-              const emptyStars = 5 - filledStars;
-
               const detailHref = `/campground/${spot.id}`;
 
               return (
@@ -226,33 +220,14 @@ export default async function Home() {
                   />
 
                   <div className="p-6">
-                    <div className="flex items-start justify-between gap-4">
-                      <h3 className="text-lg font-extrabold tracking-tight">
-                        {spot.title}
-                      </h3>
-                      <div
-                        className="shrink-0 text-right"
-                        aria-label={`Rating ${spot.rating} out of 5`}
-                      >
-                        <div className="text-sm font-semibold text-foreground">
-                          {spot.rating.toFixed(1)}
-                        </div>
-                        <div className="text-sm leading-none text-accent">
-                          {"★".repeat(filledStars)}
-                          <span className="text-foreground/30">
-                            {"★".repeat(emptyStars)}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
+                    <h3 className="text-lg font-extrabold tracking-tight">
+                      {spot.title}
+                    </h3>
 
-                    <div className="mt-4 flex items-center justify-between gap-4">
-                      <div className="text-base font-semibold text-foreground">
-                        {spot.pricePerNight}
-                      </div>
+                    <div className="mt-5">
                       <Link
                         href={detailHref}
-                        className="inline-flex h-11 items-center justify-center rounded-xl border border-slate-200/60 bg-white/10 px-5 text-sm font-semibold text-foreground backdrop-blur hover:bg-white/15 dark:border-white/10"
+                        className="inline-flex h-11 w-full items-center justify-center rounded-xl border border-slate-200/60 bg-white/10 px-5 text-sm font-semibold text-foreground backdrop-blur hover:bg-white/15 dark:border-white/10"
                       >
                         View Detail
                       </Link>

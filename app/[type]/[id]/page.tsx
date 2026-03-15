@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import CommunityReviewStatus from "@/app/components/campground-detail/CommunityReviewStatus";
+
 import {
   fetchAirtableRecordById,
   fetchAirtableTablePage,
@@ -1056,6 +1058,8 @@ export default async function DynamicDetailPage(props: {
             <BestSeason months={bestSeasonMonths} rating={bestSeasonRating} />
             <GearSuggestion recordId={id} items={gearItems} />
           </section>
+
+          <CommunityReviewStatus />
         </div>
 
         <MobileStickyCTA recordId={id} title={title} mapsUrl={mapsUrl} />

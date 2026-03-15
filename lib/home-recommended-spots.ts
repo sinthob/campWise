@@ -4,9 +4,6 @@ type RecommendedSpot = {
   id: string;
   title: string;
   imageUrl?: string;
-  // Keep UI fields, but they remain dummy (not sourced from Airtable).
-  rating: number;
-  pricePerNight: string;
 };
 
 function pickRandom<T>(items: T[]): T | undefined {
@@ -57,16 +54,6 @@ function getAnyAttachmentImageUrl(fields: Record<string, unknown>) {
   return undefined;
 }
 
-function dummyRating() {
-  const options = [4.6, 4.7, 4.8, 4.9];
-  return pickRandom(options) ?? 4.8;
-}
-
-function dummyPricePerNight() {
-  const options = ["฿890/night", "฿990/night", "฿1,250/night", "฿1,490/night"];
-  return pickRandom(options) ?? "฿990/night";
-}
-
 export async function getHomeRecommendedSpots(count = 3): Promise<RecommendedSpot[]> {
   const tableName = process.env.AIRTABLE_DATA_PATH
     ? "Campgrounds"
@@ -102,7 +89,5 @@ export async function getHomeRecommendedSpots(count = 3): Promise<RecommendedSpo
     id: r.id,
     title: r.title,
     imageUrl: r.imageUrl,
-    rating: dummyRating(),
-    pricePerNight: dummyPricePerNight(),
   }));
 }
