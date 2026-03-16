@@ -282,7 +282,7 @@ function toStringListFromUnknown(value: unknown): string[] {
 
   // Split on newlines and common bullet prefixes.
   const parts = normalized
-    .split(/\n|เนโฌเธ|\u2022/g)
+    .split(/\n|\u2022/g)
     .flatMap((p) => p.split(/^\s*[-*]\s*/m))
     .map((p) => p.trim())
     .filter(Boolean);
@@ -326,7 +326,7 @@ function toShortStringFromUnknown(value: unknown): string {
 
   if (typeof value === "string") return value.trim();
   if (typeof value === "number") return String(value);
-  if (typeof value === "boolean") return value ? "Yes" : "No";
+  if (typeof value === "boolean") return value ? "ใช่" : "ไม่ใช่";
 
   if (Array.isArray(value)) {
     const parts = value
@@ -336,7 +336,7 @@ function toShortStringFromUnknown(value: unknown): string {
           : typeof v === "number"
             ? [String(v)]
             : typeof v === "boolean"
-              ? [v ? "Yes" : "No"]
+              ? [v ? "ใช่" : "ไม่ใช่"]
               : [],
       )
       .filter(Boolean);
@@ -396,7 +396,7 @@ function parseMonthBadges(raw: string): string[] {
   if (!normalized) return [];
 
   const parts = normalized
-    .split(/\n|,|\/|\u2022|เนโฌเธ/g)
+    .split(/\n|,|\/|\u2022/g)
     .map((p) => p.trim())
     .filter(Boolean);
 
@@ -503,7 +503,7 @@ function toExcerpt(raw: string, maxChars: number): string {
   const s = raw.replace(/\s+/g, " ").trim();
   if (!s) return "";
   if (s.length <= maxChars) return s;
-  return `${s.slice(0, Math.max(0, maxChars - 1)).trimEnd()}เนโฌเธ`;
+  return `${s.slice(0, Math.max(0, maxChars - 1)).trimEnd()}\u2026`;
 }
 
 function splitParagraphs(raw: string): string[] {
@@ -522,7 +522,7 @@ function extractBulletLines(raw: string): string[] {
   for (const line of lines) {
     const trimmed = line.trim();
     if (!trimmed) continue;
-    const m = trimmed.match(/^(?:[-*]|เนโฌเธ|\u2022)\s+(.*)$/);
+    const m = trimmed.match(/^(?:[-*]|\u2022)\s+(.*)$/);
     if (m?.[1]) out.push(m[1].trim());
   }
 
@@ -589,7 +589,7 @@ function parseGuideSections(raw: string): {
   const normalizeHeading = (s: string) =>
     s
       .replace(/^#+\s*/, "")
-      .replace(/[:เนเธย]$/, "")
+      .replace(/[:：]+$/, "")
       .trim()
       .toLowerCase();
 
@@ -822,8 +822,8 @@ export default async function DynamicDetailPage(props: {
     const rainySeasonText =
       typeof rainySeasonValue === "boolean"
         ? rainySeasonValue
-          ? "เน€เธยเน€เธยเน€เธเธเน€เธยเน€เธเธ“"
-          : "เน€เธยเน€เธเธเน€เธยเน€เธยเน€เธยเน€เธเธเน€เธยเน€เธเธ“"
+          ? "ใช่"
+          : "ไม่ใช่"
         : toShortStringFromUnknown(rainySeasonValue);
 
     const elevationValue =
@@ -831,7 +831,7 @@ export default async function DynamicDetailPage(props: {
       record.fields["Elevation (m)"] ??
       record.fields["Altitude"] ??
       record.fields["Altitude (m)"] ??
-      record.fields["เน€เธยเน€เธเธเน€เธเธ’เน€เธเธเน€เธเธเน€เธเธเน€เธย"];
+      undefined;
     const elevationTextRaw = toShortStringFromUnknown(elevationValue);
     const elevationText = elevationTextRaw
       ? /m\b/i.test(elevationTextRaw)
@@ -843,51 +843,51 @@ export default async function DynamicDetailPage(props: {
       record.fields["Highlight Facts"] ??
       record.fields["Highlights"] ??
       record.fields["Highlight"] ??
-      record.fields["เน€เธยเน€เธเธเน€เธโ€เน€เธโฌเน€เธโ€เน€เธยเน€เธย"];
+      undefined;
     const highlightFacts = toStringListFromUnknown(highlightFactsRaw);
     const highlightFogText = highlightFacts[0];
     const highlightSunriseText = highlightFacts[1];
 
     const quickInfoItems = [
-      location ? { icon: "เนยโ€ย", label: "Location", value: location } : null,
+      location ? { icon: "📍", label: "Location", value: location } : null,
       {
-        icon: "เนยยโ€”",
+        icon: "⏱️",
         label: "Travel time",
         value: travelTimeText,
       },
       {
-        icon: "เนยยเธ",
+        icon: "🌙",
         label: "Night temp",
         value: nightTempText,
       },
       {
-        icon: "เนยเธ",
+        icon: "⛺",
         label: "Camping",
         value: toShortStringFromUnknown(
           record.fields["Camping allowed"] ?? record.fields["Camping Allowed"],
         ),
       },
       {
-        icon: "เนยยเธ",
+        icon: "🚽",
         label: "Toilet",
         value: toShortStringFromUnknown(
           record.fields["Toilet availability"] ?? record.fields["Toilet"],
         ),
       },
       {
-        icon: "เนยเธ",
+        icon: "⚡",
         label: "Electricity",
         value: toShortStringFromUnknown(record.fields["Electricity"]),
       },
       {
-        icon: "เนยโ€เธ–",
+        icon: "📶",
         label: "Signal",
         value: toShortStringFromUnknown(
           record.fields["Signal strength"] ?? record.fields["Signal"],
         ),
       },
       {
-        icon: "เนเธย",
+        icon: "🥾",
         label: "Difficulty",
         value: toShortStringFromUnknown(
           record.fields["Difficulty level"] ?? record.fields["Difficulty"],
@@ -925,7 +925,7 @@ export default async function DynamicDetailPage(props: {
       record.fields["Packing List"];
     const gearItems = toStringListFromUnknown(gearSuggestionRaw);
 
-    // Recommended gear types (AI-filled): e.g. "เน€เธเธเน€เธเธเน€เธยเน€เธยเน€เธเธเน€เธโ€เน€เธยเน€เธยเน€เธเธ‘เน€เธยเน€เธเธเน€เธยเน€เธเธ’เน€เธเธ", "เน€เธโฌเน€เธโ€ขเน€เธยเน€เธยเน€เธโ€”เน€เธย".
+    // Recommended gear types (AI-filled): e.g. "Stove", "Rain jacket".
     const recommendedGearTypesRaw =
       record.fields["Recommended Gear"] ??
       record.fields["Recommended Gear Types"] ??
@@ -1057,13 +1057,13 @@ export default async function DynamicDetailPage(props: {
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <TripTimeline
                 title="1 Day 1 Night"
-                intro="Recommended for weekends เนโฌโ€ a compact plan that still feels complete."
+                intro="Recommended for weekends — a compact plan that still feels complete."
                 planText={roadmapOneDay}
               />
 
               <TripTimeline
                 title="2 Days 2 Nights"
-                intro="Recommended for longer breaks เนโฌโ€ slower pace, more activities."
+                intro="Recommended for longer breaks — slower pace, more activities."
                 planText={roadmapTwoDay}
               />
             </div>
@@ -1160,7 +1160,7 @@ export default async function DynamicDetailPage(props: {
     const raw = (fallbackAiSummary ?? "").replace(/\r/g, "").trim();
     if (!raw) return "";
 
-    // Prefer 1เนโฌโ€2 short sentences.
+    // Prefer 1–2 short sentences.
     const normalized = raw.replace(/\s+/g, " ");
     const sentences = normalized
       .split(/(?<=[.!?])\s+/)
@@ -1242,7 +1242,7 @@ export default async function DynamicDetailPage(props: {
         const id = m[0];
         const label = token
           .replace(id, "")
-          .replace(/[()\-เนโฌโ€เนโฌโ€:]+/g, " ")
+          .replace(/[()\-\u2013\u2014:]+/g, " ")
           .trim();
         return { id, label: label || "Gear item" };
       })
@@ -1426,7 +1426,7 @@ export default async function DynamicDetailPage(props: {
           <div className="p-6">
             {createdDateText ? (
               <div className="flex justify-end text-xs font-medium text-foreground/60">
-                เน€เธโฌเน€เธยเน€เธเธ”เน€เธยเน€เธเธเน€เธยเน€เธยเน€เธเธเน€เธเธเน€เธเธเน€เธเธ…เน€เธโฌเน€เธเธเน€เธเธ—เน€เธยเน€เธเธ {createdDateText}
+                อัปเดตเมื่อ {createdDateText}
               </div>
             ) : null}
 
@@ -1485,21 +1485,21 @@ export default async function DynamicDetailPage(props: {
 
                 const attrs = [
                   capacityText
-                    ? { icon: "เนยโ€เธ…", label: "Capacity", value: capacityText }
+                    ? { icon: "👥", label: "Capacity", value: capacityText }
                     : null,
                   categoryText || location
                     ? {
-                        icon: "เนยเธเธ",
+                        icon: "🏷️",
                         label: "Category",
                         value: categoryText || location,
                       }
                     : null,
                   weightText
-                    ? { icon: "เนยโ€“", label: "Weight", value: weightText }
+                    ? { icon: "⚖️", label: "Weight", value: weightText }
                     : null,
                   weatherSuitabilityText
                     ? {
-                        icon: "เนยย",
+                        icon: "🌦️",
                         label: "Weather",
                         value: weatherSuitabilityText,
                       }
@@ -1653,46 +1653,46 @@ export default async function DynamicDetailPage(props: {
           }
 
           return (
-            <section aria-label="เน€เธเธเน€เธเธ’เน€เธเธเน€เธเธ…เน€เธเธเน€เธโฌเน€เธเธเน€เธเธ•เน€เธเธเน€เธโ€เน€เธโฌเน€เธยเน€เธเธ”เน€เธยเน€เธเธเน€เธโฌเน€เธโ€ขเน€เธเธ”เน€เธเธ" className="mt-16 space-y-6">
+            <section aria-label="ข้อดี ข้อเสีย และการใช้งาน" className="mt-16 space-y-6">
               <header className="space-y-1">
                 <h2 className="text-xl font-semibold tracking-tight">
-                  เน€เธเธเน€เธเธ’เน€เธเธเน€เธเธ…เน€เธเธเน€เธโฌเน€เธเธเน€เธเธ•เน€เธเธเน€เธโ€เน€เธโฌเน€เธยเน€เธเธ”เน€เธยเน€เธเธเน€เธโฌเน€เธโ€ขเน€เธเธ”เน€เธเธ
+                  ข้อดี ข้อเสีย และการใช้งาน
                 </h2>
               </header>
 
               <div className="grid gap-8 md:grid-cols-2">
                 <div className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-moss/30 dark:bg-forest/60">
-                  <h3 className="text-base font-semibold">เน€เธยเน€เธยเน€เธเธเน€เธโ€เน€เธเธ•</h3>
+                  <h3 className="text-base font-semibold">ข้อดี</h3>
                   {pros.length > 0 ? (
                     <ul className="mt-4 space-y-2 text-sm leading-6 text-foreground/80">
                       {pros.slice(0, 10).map((item, idx) => (
                         <li key={`${idx}-${item}`} className="flex gap-2">
-                          <span className="mt-[2px] text-accent">เนโฌเธ</span>
+                          <span className="mt-[2px] text-accent">•</span>
                           <span>{item}</span>
                         </li>
                       ))}
                     </ul>
                   ) : (
                     <p className="mt-3 text-sm text-foreground/60">
-                      No pros listed.
+                      ยังไม่มีรายการข้อดี
                     </p>
                   )}
                 </div>
 
                 <div className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-moss/30 dark:bg-forest/60">
-                  <h3 className="text-base font-semibold">เน€เธยเน€เธยเน€เธเธเน€เธยเน€เธเธ“เน€เธยเน€เธเธ‘เน€เธโ€</h3>
+                  <h3 className="text-base font-semibold">ข้อเสีย</h3>
                   {cons.length > 0 ? (
                     <ul className="mt-4 space-y-2 text-sm leading-6 text-foreground/80">
                       {cons.slice(0, 10).map((item, idx) => (
                         <li key={`${idx}-${item}`} className="flex gap-2">
-                          <span className="mt-[2px] text-foreground/60">เนโฌเธ</span>
+                          <span className="mt-[2px] text-foreground/60">•</span>
                           <span>{item}</span>
                         </li>
                       ))}
                     </ul>
                   ) : (
                     <p className="mt-3 text-sm text-foreground/60">
-                      No cons listed.
+                      ยังไม่มีรายการข้อเสีย
                     </p>
                   )}
                 </div>
@@ -1700,11 +1700,11 @@ export default async function DynamicDetailPage(props: {
 
               {useCases.length > 0 ? (
                 <div className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-moss/30 dark:bg-forest/60">
-                  <h3 className="text-base font-semibold">เน€เธโฌเน€เธเธเน€เธเธเน€เธเธ’เน€เธเธเน€เธเธเน€เธเธ“เน€เธเธเน€เธเธเน€เธเธ‘เน€เธย</h3>
+                  <h3 className="text-base font-semibold">เหมาะสำหรับ</h3>
                   <ul className="mt-4 space-y-2 text-sm leading-6 text-foreground/80">
                     {useCases.slice(0, 12).map((item, idx) => (
                       <li key={`${idx}-${item}`} className="flex gap-2">
-                        <span className="mt-[2px] text-accent">เนโฌเธ</span>
+                        <span className="mt-[2px] text-accent">•</span>
                         <span>{item}</span>
                       </li>
                     ))}
@@ -1728,7 +1728,7 @@ export default async function DynamicDetailPage(props: {
           <section className="rounded-2xl border border-zinc-200 bg-white p-6 text-foreground shadow-sm dark:border-moss/30 dark:bg-forest dark:text-sand">
             <details className="group">
               <summary className="cursor-pointer list-none text-base font-semibold">
-                เนยโ€ย Raw review
+                📝 Raw review
                 <span className="ml-2 text-sm font-medium text-accent">
                   (click to {"open"})
                 </span>
