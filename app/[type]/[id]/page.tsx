@@ -1601,6 +1601,13 @@ export default async function DynamicDetailPage(props: {
               "Person",
             ]);
 
+            const productLinkText = pickValue(record.fields, ["Product Link"]);
+            const productLinkHref = productLinkText
+              ? /^[a-z]+:\/\//i.test(productLinkText)
+                ? productLinkText
+                : `https://${productLinkText}`
+              : "";
+
             const items = [
               brandText ? { label: "Brand", value: brandText } : null,
               modelText ? { label: "Model", value: modelText } : null,
@@ -1610,7 +1617,20 @@ export default async function DynamicDetailPage(props: {
               capacityText ? { label: "Capacity", value: capacityText } : null,
               weightText ? { label: "Weight", value: weightText } : null,
               seasonText ? { label: "Season", value: seasonText } : null,
-            ].filter(Boolean) as Array<{ label: string; value: string }>;
+              productLinkText
+                ? {
+                    label: "Product Link",
+                    value: "Open product page",
+                    href: productLinkHref,
+                    raw: productLinkText,
+                  }
+                : null,
+            ].filter(Boolean) as Array<{
+              label: string;
+              value: string;
+              href?: string;
+              raw?: string;
+            }>;
 
             if (items.length === 0) {
               return (
@@ -1631,7 +1651,25 @@ export default async function DynamicDetailPage(props: {
                       {it.label}
                     </div>
                     <div className="mt-1 text-sm font-semibold text-foreground dark:text-sand">
-                      {it.value}
+                      {it.href ? (
+                        <>
+                          <a
+                            href={it.href}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-accent hover:underline"
+                          >
+                            {it.value}
+                          </a>
+                          {it.raw ? (
+                            <div className="mt-2 break-all text-xs font-normal text-foreground/60">
+                              {it.raw}
+                            </div>
+                          ) : null}
+                        </>
+                      ) : (
+                        it.value
+                      )}
                     </div>
                   </div>
                 ))}
