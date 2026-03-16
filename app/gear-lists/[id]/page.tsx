@@ -6,6 +6,7 @@ type GearListFields = Record<string, unknown> & {
   "Set Name"?: string;
   "AI Gear Tip"?: string;
   "Gear Image"?: unknown;
+  "Product Link"?: unknown;
 };
 
 export const dynamic = "force-dynamic";
@@ -74,11 +75,19 @@ export default async function GearListDetailsPage(props: {
   const setName = record.fields["Set Name"] ?? "ชุดอุปกรณ์ (ไม่มีชื่อ)";
   const tip = record.fields["AI Gear Tip"] ?? "";
   const imageUrl = getFirstAttachmentUrl(record.fields["Gear Image"]);
+  const productLinkRaw = record.fields["Product Link"];
+  const productLink =
+    typeof productLinkRaw === "string"
+      ? productLinkRaw
+      : Array.isArray(productLinkRaw)
+        ? productLinkRaw.find((v): v is string => typeof v === "string")
+        : null;
 
   const details = getPrimitiveDetails(record.fields, [
     "Set Name",
     "AI Gear Tip",
     "Gear Image",
+    "Product Link",
   ]);
 
   return (
@@ -123,6 +132,26 @@ export default async function GearListDetailsPage(props: {
             <p className="mt-2 whitespace-pre-line text-sm leading-7 text-slate-700 dark:text-slate-300">
               {String(tip || "ยังไม่มีคำแนะนำจาก AI")}
             </p>
+
+            <div className="mt-5">
+              <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-200">
+                ลิงก์สินค้า
+              </h3>
+              {productLink ? (
+                <a
+                  href={productLink}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mt-2 inline-flex items-center text-sm font-medium text-primary hover:underline"
+                >
+                  เปิดหน้าสินค้า
+                </a>
+              ) : (
+                <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
+                  ยังไม่มีลิงก์สินค้า
+                </p>
+              )}
+            </div>
 
             {details.length > 0 ? (
               <>
