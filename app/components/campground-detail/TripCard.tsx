@@ -126,7 +126,7 @@ export default function TripCard(props: {
             aria-controls={contentId}
             onClick={() => setOpen((v) => !v)}
           >
-            {open ? "Hide" : "Show"}
+            {open ? "ซ่อน" : "แสดง"}
           </button>
         ) : null}
       </div>
@@ -168,7 +168,7 @@ export default function TripCard(props: {
             onClick={copyPlan}
             className="inline-flex items-center justify-center rounded-full border border-zinc-200 bg-white px-4 py-2 text-sm font-medium text-foreground hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent dark:border-transparent dark:bg-forest dark:text-sand dark:ring-1 dark:ring-moss/30 dark:hover:bg-forest/80"
           >
-            {copied ? "Copied" : "Copy Plan"}
+            {copied ? "คัดลอกแล้ว" : "คัดลอกแผน"}
           </button>
 
           <button
@@ -177,7 +177,7 @@ export default function TripCard(props: {
             className="inline-flex items-center justify-center rounded-full bg-accent px-4 py-2 text-sm font-semibold text-forest hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             aria-pressed={saved}
           >
-            {saved ? "Saved" : "Save"}
+            {saved ? "บันทึกแล้ว" : "บันทึก"}
           </button>
         </div>
       </div>

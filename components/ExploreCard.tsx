@@ -35,7 +35,7 @@ export default function ExploreCard(props: ExploreCardProps) {
             />
           ) : (
             <div className="flex h-full w-full items-center justify-center text-sm text-slate-500 dark:text-sand/70">
-              No image
+              ไม่มีรูป
             </div>
           )}
         </div>

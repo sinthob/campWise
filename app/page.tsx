@@ -25,14 +25,14 @@ export default async function Home() {
         <div className="relative mx-auto w-full max-w-6xl px-4 py-16 sm:py-24">
           <div className="mx-auto max-w-3xl text-center text-white">
             <p className="text-xs font-semibold tracking-[0.22em] text-white/80 sm:text-sm">
-              PLAN • PACK • EXPLORE
+              วางแผน • จัดของ • ออกเดินทาง
             </p>
             <h1 className="mt-4 text-4xl font-extrabold tracking-tight sm:text-6xl">
               CampWise
             </h1>
             <p className="mx-auto mt-4 max-w-2xl text-base font-medium leading-7 text-white/85 sm:text-lg">
-              Discover campgrounds, build dialed gear lists, and learn practical
-              tips &amp; hacks for the trail.
+              ค้นหาลานกางเต็นท์ จัดลิสต์อุปกรณ์ให้พร้อม และเรียนรู้เคล็ดลับ &amp;
+              ทริคสำหรับสายแคมป์
             </p>
 
             <form
@@ -42,10 +42,10 @@ export default async function Home() {
             >
               <div className="flex flex-col gap-3 rounded-2xl border border-white/20 bg-white/10 p-3 backdrop-blur-xl sm:flex-row sm:items-center">
                 <label className="flex-1">
-                  <span className="sr-only">Search</span>
+                  <span className="sr-only">ค้นหา</span>
                   <input
                     name="q"
-                    placeholder="Search locations or provinces"
+                    placeholder="ค้นหาสถานที่หรือจังหวัด"
                     className="h-12 w-full rounded-xl border border-white/15 bg-white/5 px-4 text-sm font-medium text-white outline-none placeholder:text-white/60 focus:border-accent focus:ring-2 focus:ring-accent/30"
                   />
                 </label>
@@ -53,7 +53,7 @@ export default async function Home() {
                   type="submit"
                   className="inline-flex h-12 items-center justify-center rounded-xl bg-accent px-6 text-sm font-semibold text-slate-900 hover:bg-accent/90"
                 >
-                  Search
+                  ค้นหา
                 </button>
               </div>
             </form>
@@ -84,22 +84,22 @@ export default async function Home() {
                     aria-hidden="true"
                   />
                   <div className="relative flex h-full w-full items-center justify-center text-sm font-semibold tracking-wide text-white/90">
-                    Campgrounds
+                    ลานกางเต็นท์
                   </div>
                 </>
               ) : (
                 <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-200/60 to-slate-100/30 text-sm font-semibold tracking-wide text-slate-700/80 dark:from-white/10 dark:to-white/5 dark:text-white/70">
-                  Campgrounds
+                  ลานกางเต็นท์
                 </div>
               )}
             </div>
 
             <div className="p-6">
               <h2 className="text-lg font-extrabold tracking-tight text-foreground">
-                Campgrounds
+                ลานกางเต็นท์
               </h2>
               <p className="mt-2 text-base leading-7 text-foreground/70">
-                Browse camping spots from the directory.
+                ค้นหาลานกางเต็นท์จากไดเรกทอรี
               </p>
             </div>
           </Link>
@@ -125,22 +125,22 @@ export default async function Home() {
                     aria-hidden="true"
                   />
                   <div className="relative flex h-full w-full items-center justify-center text-sm font-semibold tracking-wide text-white/90">
-                    Gear Lists
+                    รายการอุปกรณ์
                   </div>
                 </>
               ) : (
                 <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-200/60 to-slate-100/30 text-sm font-semibold tracking-wide text-slate-700/80 dark:from-white/10 dark:to-white/5 dark:text-white/70">
-                  Gear Lists
+                  รายการอุปกรณ์
                 </div>
               )}
             </div>
 
             <div className="p-6">
               <h2 className="text-lg font-extrabold tracking-tight text-foreground">
-                Gear Lists
+                รายการอุปกรณ์
               </h2>
               <p className="mt-2 text-base leading-7 text-foreground/70">
-                View gear set cards with AI tips.
+                ดูชุดอุปกรณ์พร้อมคำแนะนำจาก AI
               </p>
             </div>
           </Link>
@@ -166,22 +166,22 @@ export default async function Home() {
                     aria-hidden="true"
                   />
                   <div className="relative flex h-full w-full items-center justify-center text-sm font-semibold tracking-wide text-white/90">
-                    Tips &amp; Hacks
+                    เคล็ดลับ &amp; ทริค
                   </div>
                 </>
               ) : (
                 <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-200/60 to-slate-100/30 text-sm font-semibold tracking-wide text-slate-700/80 dark:from-white/10 dark:to-white/5 dark:text-white/70">
-                  Tips &amp; Hacks
+                  เคล็ดลับ &amp; ทริค
                 </div>
               )}
             </div>
 
             <div className="p-6">
               <h2 className="text-lg font-extrabold tracking-tight text-foreground">
-                Camping Tips &amp; Hacks
+                เคล็ดลับ &amp; ทริคแคมป์
               </h2>
               <p className="mt-2 text-base leading-7 text-foreground/70">
-                Quick tips to camp smarter.
+                ทิปส์สั้น ๆ ให้แคมป์ได้ฉลาดขึ้น
               </p>
             </div>
           </Link>
@@ -190,11 +190,10 @@ export default async function Home() {
         <section className="mt-12">
           <header className="mb-6">
             <h2 className="text-2xl font-extrabold tracking-tight">
-              Recommended Spots
+              สถานที่แนะนำ
             </h2>
             <p className="mt-2 max-w-2xl text-base leading-7 text-foreground/70">
-              Featured camp-ready getaways picked for views, vibes, and easy
-              access.
+              ทริปแคมป์ที่คัดมาแล้ว เน้นวิว บรรยากาศ และเดินทางง่าย
             </p>
           </header>
 
@@ -229,7 +228,7 @@ export default async function Home() {
                         href={detailHref}
                         className="inline-flex h-11 w-full items-center justify-center rounded-xl border border-slate-200/60 bg-white/10 px-5 text-sm font-semibold text-foreground backdrop-blur hover:bg-white/15 dark:border-white/10"
                       >
-                        View Detail
+                        ดูรายละเอียด
                       </Link>
                     </div>
                   </div>

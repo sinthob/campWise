@@ -51,7 +51,7 @@ export default function HeroActions(props: {
   }
 
   return (
-    <section aria-label="Actions" className="mt-5">
+    <section aria-label="การดำเนินการ" className="mt-5">
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <button
           type="button"
@@ -59,7 +59,7 @@ export default function HeroActions(props: {
           aria-pressed={saved}
           className="inline-flex h-12 w-full items-center justify-center rounded-full bg-accent px-5 text-sm font-semibold text-forest hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
-          {saved ? "🔖 Saved" : "🔖 Save Place"}
+          {saved ? "🔖 บันทึกแล้ว" : "🔖 บันทึกสถานที่"}
         </button>
 
         <a
@@ -68,7 +68,7 @@ export default function HeroActions(props: {
           rel="noreferrer"
           className="inline-flex h-12 w-full items-center justify-center rounded-full border border-zinc-200 bg-white px-5 text-sm font-semibold text-foreground hover:border-primary/30 hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent dark:border-transparent dark:bg-forest dark:text-sand dark:ring-1 dark:ring-moss/30 dark:hover:bg-forest/80"
         >
-          🗺 Open in Google Maps
+          🗺 เปิดใน Google Maps
         </a>
 
         <button
@@ -76,7 +76,7 @@ export default function HeroActions(props: {
           onClick={share}
           className="inline-flex h-12 w-full items-center justify-center rounded-full border border-zinc-200 bg-white px-5 text-sm font-semibold text-foreground hover:border-primary/30 hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent dark:border-transparent dark:bg-forest dark:text-sand dark:ring-1 dark:ring-moss/30 dark:hover:bg-forest/80 sm:col-span-2"
         >
-          {shared ? "📤 Shared" : "📤 Share"}
+          {shared ? "📤 แชร์แล้ว" : "📤 แชร์"}
         </button>
       </div>
     </section>

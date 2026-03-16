@@ -1,13 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import {
-  MessageSquarePlus,
-  Star,
-  ThumbsDown,
-  ThumbsUp,
-  X,
-} from "lucide-react";
+import { MessageSquarePlus, Star, ThumbsDown, ThumbsUp, X } from "lucide-react";
 
 type Review = {
   id: string;
@@ -24,7 +18,7 @@ const TAGS = [
   "⚡️ มีไฟฟ้า",
   "🚽 ห้องน้ำแยก",
   "🚿 น้ำอุ่น",
-  "🐾 Pet-Friendly",
+  "🐾 นำสัตว์เลี้ยงเข้าได้",
   "📶 เน็ตแรง (5G)",
   "🔇 งดเสียงหลัง 4 ทุ่ม",
   "🎸 ใช้เสียงได้",
@@ -41,10 +35,10 @@ function formatRelativeTime(createdAt: number) {
   const diffHr = Math.floor(diffMin / 60);
   const diffDay = Math.floor(diffHr / 24);
 
-  if (diffMin < 1) return "just now";
-  if (diffMin < 60) return `${diffMin} minutes ago`;
-  if (diffHr < 24) return `${diffHr} hours ago`;
-  return `${diffDay} days ago`;
+  if (diffMin < 1) return "เมื่อสักครู่";
+  if (diffMin < 60) return `${diffMin} นาทีที่แล้ว`;
+  if (diffHr < 24) return `${diffHr} ชั่วโมงที่แล้ว`;
+  return `${diffDay} วันที่แล้ว`;
 }
 
 function newId() {
@@ -55,14 +49,15 @@ function newId() {
   return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
-function StarRow(props: {
-  value: number;
-  onChange: (next: number) => void;
-}) {
+function StarRow(props: { value: number; onChange: (next: number) => void }) {
   const v = clampInt(props.value, 1, 5);
 
   return (
-    <div className="flex items-center gap-1" role="radiogroup" aria-label="Star rating">
+    <div
+      className="flex items-center gap-1"
+      role="radiogroup"
+      aria-label="ให้คะแนนดาว"
+    >
       {Array.from({ length: 5 }).map((_, idx) => {
         const n = idx + 1;
         const active = n <= v;
@@ -74,7 +69,7 @@ function StarRow(props: {
             onClick={() => props.onChange(n)}
             role="radio"
             aria-checked={n === v}
-            aria-label={`${n} star${n === 1 ? "" : "s"}`}
+            aria-label={`${n} ดาว`}
           >
             <Star
               className={`h-5 w-5 ${active ? "fill-accent text-accent" : "text-foreground/40"}`}
@@ -124,7 +119,7 @@ export default function CommunityReviewStatus() {
   const [reviews, setReviews] = useState<Review[]>(() => [
     {
       id: newId(),
-      name: "Guest Camper",
+      name: "นักแคมป์ทั่วไป",
       createdAt: Date.now() - 2 * 60 * 60 * 1000,
       rating: 5,
       tags: ["⚡️ มีไฟฟ้า", "🚽 ห้องน้ำแยก", "🔇 งดเสียงหลัง 4 ทุ่ม"],
@@ -159,7 +154,7 @@ export default function CommunityReviewStatus() {
     setReviews((prev) => [
       {
         id: newId(),
-        name: "Guest Camper",
+        name: "นักแคมป์ทั่วไป",
         createdAt: Date.now(),
         rating: clampInt(rating, 1, 5),
         tags: selectedTags,
@@ -186,16 +181,16 @@ export default function CommunityReviewStatus() {
 
   return (
     <section
-      aria-label="Community Review & Status"
+      aria-label="รีวิวจากชุมชน & สถานะ"
       className="rounded-3xl border border-zinc-200 bg-white p-5 text-foreground shadow-sm dark:border-moss/30 dark:bg-forest dark:text-sand"
     >
       <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-lg font-semibold tracking-tight sm:text-xl">
-            Community Review &amp; Status
+            รีวิวจากชุมชน &amp; สถานะ
           </h2>
           <p className="mt-1 text-sm leading-6 text-slate-600 dark:text-sand/70">
-            Share quick on-site info to help campers plan better.
+            แชร์ข้อมูลหน้างานสั้น ๆ เพื่อช่วยคนอื่นวางแผนได้ดีขึ้น
           </p>
         </div>
 
@@ -204,31 +199,38 @@ export default function CommunityReviewStatus() {
           onClick={() => setOpen((v) => !v)}
           className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-primary px-5 text-sm font-semibold text-white hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent dark:bg-primary/90 dark:hover:bg-primary"
         >
-          {open ? <X className="h-4 w-4" /> : <MessageSquarePlus className="h-4 w-4" />}
-          {open ? "Close" : "Add Review"}
+          {open ? (
+            <X className="h-4 w-4" />
+          ) : (
+            <MessageSquarePlus className="h-4 w-4" />
+          )}
+          {open ? "ปิด" : "เพิ่มรีวิว"}
         </button>
       </header>
 
       {open ? (
-        <form onSubmit={submit} className="mt-5 rounded-2xl bg-white/5 p-4 ring-1 ring-zinc-200/70 backdrop-blur dark:bg-forest/60 dark:ring-moss/30">
+        <form
+          onSubmit={submit}
+          className="mt-5 rounded-2xl bg-white/5 p-4 ring-1 ring-zinc-200/70 backdrop-blur dark:bg-forest/60 dark:ring-moss/30"
+        >
           <div className="grid grid-cols-1 gap-4">
             <div className="flex flex-col gap-2">
-              <div className="text-sm font-semibold">Star Rating</div>
+              <div className="text-sm font-semibold">ให้คะแนน</div>
               <StarRow value={rating} onChange={setRating} />
             </div>
 
             <div className="flex flex-col gap-2">
-              <div className="text-sm font-semibold">Quick Tags</div>
+              <div className="text-sm font-semibold">แท็กด่วน</div>
               <TagChips selected={tags} onToggle={toggleTag} />
             </div>
 
             <label className="flex flex-col gap-2">
-              <span className="text-sm font-semibold">Comment</span>
+              <span className="text-sm font-semibold">คอมเมนต์</span>
               <textarea
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
                 rows={3}
-                placeholder="Share a quick note (noise, facilities, signal, etc.)"
+                placeholder="แชร์โน้ตสั้น ๆ (เสียงดัง, ห้องน้ำ, สัญญาณ, ฯลฯ)"
                 className="w-full resize-none rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 outline-none placeholder:text-zinc-400 focus:border-accent focus:ring-2 focus:ring-accent/20 dark:border-moss/40 dark:bg-forest/60 dark:text-sand dark:placeholder:text-sand/60"
               />
             </label>
@@ -242,13 +244,13 @@ export default function CommunityReviewStatus() {
                 }}
                 className="inline-flex h-11 items-center justify-center rounded-full border border-zinc-200 bg-white px-5 text-sm font-semibold text-zinc-900 hover:bg-zinc-50 dark:border-moss/40 dark:bg-forest/60 dark:text-sand dark:hover:bg-forest"
               >
-                Cancel
+                ยกเลิก
               </button>
               <button
                 type="submit"
                 className="inline-flex h-11 items-center justify-center rounded-full bg-accent px-6 text-sm font-semibold text-slate-900 hover:bg-accent/90"
               >
-                Post Review
+                โพสต์รีวิว
               </button>
             </div>
           </div>
@@ -263,13 +265,18 @@ export default function CommunityReviewStatus() {
           >
             <div className="flex items-start justify-between gap-4">
               <div>
-                <div className="text-sm font-semibold">{r.name || "Anonymous"}</div>
+                <div className="text-sm font-semibold">
+                  {r.name || "ไม่ระบุชื่อ"}
+                </div>
                 <div className="mt-1 text-xs text-slate-600 dark:text-sand/70">
                   {formatRelativeTime(r.createdAt)}
                 </div>
               </div>
 
-              <div className="flex items-center gap-1" aria-label={`Rating ${r.rating} out of 5`}>
+              <div
+                className="flex items-center gap-1"
+                aria-label={`คะแนน ${r.rating} จาก 5`}
+              >
                 {Array.from({ length: 5 }).map((_, idx) => {
                   const active = idx + 1 <= r.rating;
                   return (

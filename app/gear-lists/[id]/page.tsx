@@ -29,8 +29,8 @@ function getPrimitiveDetails(
           ? "-"
           : typeof value === "boolean"
             ? value
-              ? "Yes"
-              : "No"
+              ? "ใช่"
+              : "ไม่ใช่"
             : String(value),
     }));
 }
@@ -57,21 +57,21 @@ export default async function GearListDetailsPage(props: {
             href="/gear-lists"
             className="text-sm font-medium text-slate-700 hover:text-primary dark:text-slate-300"
           >
-            ← Back to Gear Lists
+            ← กลับไปที่รายการอุปกรณ์
           </Link>
 
           <h1 className="mt-6 text-2xl font-semibold tracking-tight">
-            Gear list not found
+            ไม่พบรายการอุปกรณ์
           </h1>
           <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
-            This record may have been removed or you may not have access.
+            อาจถูกลบ หรือคุณไม่มีสิทธิ์เข้าถึง
           </p>
         </div>
       </div>
     );
   }
 
-  const setName = record.fields["Set Name"] ?? "Untitled Set";
+  const setName = record.fields["Set Name"] ?? "ชุดอุปกรณ์ (ไม่มีชื่อ)";
   const tip = record.fields["AI Gear Tip"] ?? "";
   const imageUrl = getFirstAttachmentUrl(record.fields["Gear Image"]);
 
@@ -88,7 +88,7 @@ export default async function GearListDetailsPage(props: {
           href="/gear-lists"
           className="text-sm font-medium text-slate-700 hover:text-primary dark:text-slate-300"
         >
-          ← Back to Gear Lists
+          ← กลับไปที่รายการอุปกรณ์
         </Link>
 
         <header className="mt-6">
@@ -104,13 +104,13 @@ export default async function GearListDetailsPage(props: {
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={imageUrl}
-                  alt={typeof setName === "string" ? setName : "Gear image"}
+                  alt={typeof setName === "string" ? setName : "รูปอุปกรณ์"}
                   className="h-full w-full object-cover"
                   loading="lazy"
                 />
               ) : (
                 <div className="flex h-full w-full items-center justify-center text-sm text-zinc-500 dark:text-zinc-400">
-                  No image
+                  ไม่มีรูป
                 </div>
               )}
             </div>
@@ -118,16 +118,16 @@ export default async function GearListDetailsPage(props: {
 
           <div className="p-5 sm:p-6">
             <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-200">
-              AI Gear Tip
+              คำแนะนำจาก AI
             </h2>
             <p className="mt-2 whitespace-pre-line text-sm leading-7 text-slate-700 dark:text-slate-300">
-              {String(tip || "No AI gear tip available yet.")}
+              {String(tip || "ยังไม่มีคำแนะนำจาก AI")}
             </p>
 
             {details.length > 0 ? (
               <>
                 <h3 className="mt-6 text-lg font-semibold text-slate-900 dark:text-slate-200">
-                  Details
+                  รายละเอียด
                 </h3>
                 <dl className="mt-3 grid grid-cols-1 gap-y-3 text-sm text-slate-600 dark:text-slate-400 sm:grid-cols-2 sm:gap-x-8">
                   {details.map((d) => (

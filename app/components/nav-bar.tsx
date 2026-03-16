@@ -27,19 +27,19 @@ export default function NavBar() {
             href="/gear-lists"
             className="rounded-full px-4 py-2 text-sm text-foreground/80 hover:bg-zinc-100 hover:text-foreground dark:text-sand/85 dark:hover:bg-moss/20 dark:hover:text-sand"
           >
-            Gear Lists
+            รายการอุปกรณ์
           </Link>
           <Link
             href="/campgrounds"
             className="rounded-full px-4 py-2 text-sm text-foreground/80 hover:bg-zinc-100 hover:text-foreground dark:text-sand/85 dark:hover:bg-moss/20 dark:hover:text-sand"
           >
-            Campgrounds
+            ลานกางเต็นท์
           </Link>
           <Link
             href="/camping-hacks"
             className="rounded-full px-4 py-2 text-sm text-foreground/80 hover:bg-zinc-100 hover:text-foreground dark:text-sand/85 dark:hover:bg-moss/20 dark:hover:text-sand"
           >
-            Tips &amp; Hacks
+            เคล็ดลับ &amp; ทริค
           </Link>
         </nav>
 
@@ -49,10 +49,10 @@ export default function NavBar() {
             const next = isDark ? "light" : "dark";
             setTheme(next);
           }}
-          aria-label="Toggle dark mode"
+          aria-label="สลับโหมดสว่าง/มืด"
           className="inline-flex h-10 items-center justify-center rounded-full border border-zinc-200 bg-white px-4 text-sm font-semibold text-foreground hover:bg-zinc-50 dark:border-moss/40 dark:bg-forest dark:text-sand dark:hover:bg-moss/20"
         >
-          {isDark ? "Theme: Dark" : "Theme: Light"}
+          {isDark ? "ธีม: มืด" : "ธีม: สว่าง"}
         </button>
       </div>
 
@@ -61,19 +61,19 @@ export default function NavBar() {
           href="/gear-lists"
           className="flex-1 rounded-full px-3 py-2 text-center text-sm text-foreground/80 hover:bg-zinc-100 hover:text-foreground dark:text-sand/85 dark:hover:bg-moss/20 dark:hover:text-sand"
         >
-          Gear
+          อุปกรณ์
         </Link>
         <Link
           href="/campgrounds"
           className="flex-1 rounded-full px-3 py-2 text-center text-sm text-foreground/80 hover:bg-zinc-100 hover:text-foreground dark:text-sand/85 dark:hover:bg-moss/20 dark:hover:text-sand"
         >
-          Camps
+          แคมป์
         </Link>
         <Link
           href="/camping-hacks"
           className="flex-1 rounded-full px-3 py-2 text-center text-sm text-foreground/80 hover:bg-zinc-100 hover:text-foreground dark:text-sand/85 dark:hover:bg-moss/20 dark:hover:text-sand"
         >
-          Tips
+          เคล็ดลับ
         </Link>
       </nav>
     </header>

@@ -43,7 +43,7 @@ export default function ListFilters(props: Props) {
     <div className="mb-6 rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-moss/30 dark:bg-forest">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <label className="flex-1">
-          <span className="sr-only">Search</span>
+          <span className="sr-only">ค้นหา</span>
           <input
             value={q}
             onChange={(e) => update({ q: e.target.value })}

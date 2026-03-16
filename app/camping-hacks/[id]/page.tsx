@@ -56,21 +56,21 @@ export default async function CampingHackDetailsPage(props: {
             href="/camping-hacks"
             className="text-sm font-medium text-slate-700 hover:text-primary dark:text-slate-300"
           >
-            ← Back to Tips &amp; Hacks
+            ← กลับไปที่เคล็ดลับ &amp; ทริค
           </Link>
 
           <h1 className="mt-6 text-2xl font-semibold tracking-tight">
-            Tip / Hack not found
+            ไม่พบเคล็ดลับ/ทริค
           </h1>
           <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
-            This record may have been removed or you may not have access.
+            อาจถูกลบ หรือคุณไม่มีสิทธิ์เข้าถึง
           </p>
         </div>
       </div>
     );
   }
 
-  const title = record.fields["Topic name"] ?? "Untitled";
+  const title = record.fields["Topic name"] ?? "ไม่มีชื่อ";
   const content = record.fields.Content ?? "";
   const imageUrl = getAnyAttachmentImageUrl(record.fields);
 
@@ -81,7 +81,7 @@ export default async function CampingHackDetailsPage(props: {
           href="/camping-hacks"
           className="text-sm font-medium text-slate-700 hover:text-primary dark:text-slate-300"
         >
-          ← Back to Tips &amp; Hacks
+          ← กลับไปที่เคล็ดลับ &amp; ทริค
         </Link>
 
         <header className="mt-6">
@@ -97,13 +97,13 @@ export default async function CampingHackDetailsPage(props: {
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={imageUrl}
-                  alt={typeof title === "string" ? title : "Camping tip"}
+                  alt={typeof title === "string" ? title : "เคล็ดลับแคมป์"}
                   className="h-full w-full object-cover"
                   loading="lazy"
                 />
               ) : (
                 <div className="flex h-full w-full items-center justify-center text-sm text-zinc-500 dark:text-zinc-400">
-                  Image placeholder
+                  รูปภาพตัวอย่าง
                 </div>
               )}
             </div>
@@ -111,7 +111,7 @@ export default async function CampingHackDetailsPage(props: {
 
           <div className="p-5 sm:p-6">
             <p className="whitespace-pre-line text-sm leading-7 text-slate-700 dark:text-slate-300">
-              {content || "No content available yet."}
+              {content || "ยังไม่มีเนื้อหา"}
             </p>
           </div>
         </section>

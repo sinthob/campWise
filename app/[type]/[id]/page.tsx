@@ -1090,11 +1090,6 @@ export default async function DynamicDetailPage(props: {
   const bestForList = parsedInsight?.bestFor?.length
     ? parsedInsight.bestFor
     : toStringListFromUnknown(bestFor);
-  const tipsList = parsedInsight?.tips?.length
-    ? parsedInsight.tips
-    : toStringListFromUnknown(
-        tips ?? (aiSummaryLooksJson ? undefined : fallbackAiSummary),
-      );
 
   const createdDateText = record.createdTime
     ? new Date(record.createdTime).toLocaleDateString("en-US", {

@@ -69,16 +69,16 @@ export default async function CampingHacksPage(props: {
       <div className="mx-auto w-full max-w-6xl">
         <header className="mb-8">
           <h1 className="text-3xl font-semibold tracking-tight">
-            Camping Tips &amp; Hacks
+            เคล็ดลับ &amp; ทริคแคมป์
           </h1>
           <p className="mt-2 max-w-2xl text-sm text-slate-600 dark:text-slate-400">
-            Practical techniques and ideas for smarter camping.
+            เทคนิคและไอเดียสำหรับการแคมป์แบบฉลาดขึ้น
           </p>
         </header>
 
         <section className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           {records.map((record) => {
-            const title = record.fields["Topic name"] ?? "Untitled";
+            const title = record.fields["Topic name"] ?? "ไม่มีชื่อ";
             const content = record.fields.Content ?? "";
             const imageUrl = getAnyAttachmentImageUrl(record.fields);
             const excerpt = toExcerpt(content, 180);
@@ -88,10 +88,10 @@ export default async function CampingHacksPage(props: {
                 key={record.id}
                 typePath="hack"
                 id={record.id}
-                badge="Hack"
+                badge="ทริค"
                 title={String(title)}
                 image={imageUrl}
-                summary={excerpt || "No content available yet."}
+                summary={excerpt || "ยังไม่มีเนื้อหา"}
               />
             );
           })}
@@ -99,7 +99,7 @@ export default async function CampingHacksPage(props: {
 
         <nav className="mt-10 flex items-center justify-between">
           <div className="text-sm text-zinc-600 dark:text-zinc-400">
-            Page {page}
+            หน้า {page}
           </div>
           <div className="flex gap-3">
             {prevHref ? (
@@ -107,11 +107,11 @@ export default async function CampingHacksPage(props: {
                 href={prevHref}
                 className="inline-flex h-10 items-center justify-center rounded-full border border-zinc-200 bg-white px-5 text-sm font-medium text-zinc-900 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50 dark:hover:bg-zinc-900"
               >
-                Previous
+                ก่อนหน้า
               </Link>
             ) : (
               <span className="inline-flex h-10 items-center justify-center rounded-full border border-zinc-200 px-5 text-sm font-medium text-zinc-400 dark:border-zinc-800 dark:text-zinc-500">
-                Previous
+                ก่อนหน้า
               </span>
             )}
 
@@ -120,11 +120,11 @@ export default async function CampingHacksPage(props: {
                 href={nextHref}
                 className="inline-flex h-10 items-center justify-center rounded-full border border-zinc-200 bg-white px-5 text-sm font-medium text-zinc-900 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50 dark:hover:bg-zinc-900"
               >
-                Next
+                ถัดไป
               </Link>
             ) : (
               <span className="inline-flex h-10 items-center justify-center rounded-full border border-zinc-200 px-5 text-sm font-medium text-zinc-400 dark:border-zinc-800 dark:text-zinc-500">
-                Next
+                ถัดไป
               </span>
             )}
           </div>

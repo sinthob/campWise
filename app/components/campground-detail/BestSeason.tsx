@@ -17,15 +17,15 @@ export default function BestSeason(props: BestSeasonProps) {
 
   return (
     <section
-      aria-label="Best season"
+      aria-label="ฤดูกาลที่เหมาะที่สุด"
       className="rounded-3xl border border-zinc-200 bg-white p-5 text-foreground shadow-sm dark:border-moss/30 dark:bg-forest dark:text-sand"
     >
-      <h2 className="text-base font-semibold">🌤 Best Season</h2>
+      <h2 className="text-base font-semibold">🌤 ฤดูกาลที่เหมาะที่สุด</h2>
 
       {rating !== undefined ? (
         <p
           className="mt-2 text-sm text-slate-600 dark:text-sand/80"
-          aria-label={`Rating ${rating} out of 5`}
+          aria-label={`คะแนน ${rating} จาก 5`}
         >
           {Array.from({ length: 5 })
             .map((_, idx) => (idx < rating ? "⭐" : "☆"))
@@ -34,7 +34,7 @@ export default function BestSeason(props: BestSeasonProps) {
       ) : null}
 
       {months.length > 0 ? (
-        <ul className="mt-3 flex flex-wrap gap-2" aria-label="Best months">
+        <ul className="mt-3 flex flex-wrap gap-2" aria-label="เดือนที่แนะนำ">
           {months.map((m) => (
             <li
               key={m}

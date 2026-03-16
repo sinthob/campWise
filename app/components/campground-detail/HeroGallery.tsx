@@ -13,7 +13,7 @@ export default function HeroGallery(props: {
 
   return (
     <section
-      aria-label="Campground photos"
+      aria-label="รูปภาพลานกางเต็นท์"
       className="overflow-hidden rounded-3xl border border-zinc-200 bg-white shadow-sm dark:border-moss/30 dark:bg-forest"
     >
       {images.length > 0 ? (
@@ -31,7 +31,7 @@ export default function HeroGallery(props: {
           </div>
 
           {images.length > 1 ? (
-            <ul className="grid grid-cols-4 gap-3" aria-label="More photos">
+            <ul className="grid grid-cols-4 gap-3" aria-label="รูปภาพเพิ่มเติม">
               {images.slice(1, 5).map((img) => (
                 <li
                   key={img.url}
@@ -53,18 +53,18 @@ export default function HeroGallery(props: {
 
           {images.length > 5 ? (
             <p className="text-xs text-slate-600 dark:text-sand/70">
-              Showing 5 of {images.length} photos
+              แสดง 5 จาก {images.length} รูป
             </p>
           ) : null}
         </div>
       ) : (
         <div className="flex h-[160px] w-full items-center justify-center bg-zinc-100 text-sm text-zinc-500 dark:bg-moss dark:text-sand/70 sm:h-[220px]">
-          No image available
+          ไม่มีรูปภาพ
         </div>
       )}
 
       <div className="sr-only">
-        Photo gallery for {props.title}. {images.length} photos.
+        แกลเลอรีรูปภาพของ {props.title} มี {images.length} รูป
       </div>
     </section>
   );

@@ -76,24 +76,24 @@ export default async function GearListsPage(props: {
       <div className="mx-auto w-full max-w-6xl">
         <header className="mb-8">
           <h1 className="text-3xl font-semibold tracking-tight">
-            Gear Listing
+            รายการอุปกรณ์
           </h1>
           <p className="mt-2 max-w-2xl text-sm text-slate-600 dark:text-slate-400">
-            Curated gear sets with AI suggestions.
+            ชุดอุปกรณ์ที่คัดมาแล้ว พร้อมคำแนะนำจาก AI
           </p>
         </header>
 
         <ListFilters
           basePath="/gear-lists"
-          searchPlaceholder="Search gear lists..."
-          typeLabel="Type"
-          typePlaceholder="All types"
+          searchPlaceholder="ค้นหารายการอุปกรณ์..."
+          typeLabel="ประเภท"
+          typePlaceholder="ทุกประเภท"
           typeOptions={typeOptions}
         />
 
         <section className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {records.map((record) => {
-            const setName = record.fields["Set Name"] ?? "Untitled Set";
+            const setName = record.fields["Set Name"] ?? "ชุดอุปกรณ์ (ไม่มีชื่อ)";
             const tip = record.fields["AI Gear Tip"] ?? "";
             const imageUrl = getFirstAttachmentUrl(record.fields["Gear Image"]);
             const excerpt = toExcerpt(tip, 160);
@@ -103,10 +103,10 @@ export default async function GearListsPage(props: {
                 key={record.id}
                 typePath="gear"
                 id={record.id}
-                badge="Gear"
+                badge="อุปกรณ์"
                 title={String(setName)}
                 image={imageUrl}
-                summary={excerpt || "No AI gear tip available yet."}
+                summary={excerpt || "ยังไม่มีคำแนะนำจาก AI"}
               />
             );
           })}
@@ -114,7 +114,7 @@ export default async function GearListsPage(props: {
 
         <nav className="mt-10 flex items-center justify-between">
           <div className="text-sm text-zinc-600 dark:text-zinc-400">
-            Page {page}
+            หน้า {page}
           </div>
           <div className="flex gap-3">
             {prevHref ? (
@@ -122,11 +122,11 @@ export default async function GearListsPage(props: {
                 href={prevHref}
                 className="inline-flex h-10 items-center justify-center rounded-full border border-zinc-200 bg-white px-5 text-sm font-medium text-zinc-900 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50 dark:hover:bg-zinc-900"
               >
-                Previous
+                ก่อนหน้า
               </Link>
             ) : (
               <span className="inline-flex h-10 items-center justify-center rounded-full border border-zinc-200 px-5 text-sm font-medium text-zinc-400 dark:border-zinc-800 dark:text-zinc-500">
-                Previous
+                ก่อนหน้า
               </span>
             )}
 
@@ -135,11 +135,11 @@ export default async function GearListsPage(props: {
                 href={nextHref}
                 className="inline-flex h-10 items-center justify-center rounded-full border border-zinc-200 bg-white px-5 text-sm font-medium text-zinc-900 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50 dark:hover:bg-zinc-900"
               >
-                Next
+                ถัดไป
               </Link>
             ) : (
               <span className="inline-flex h-10 items-center justify-center rounded-full border border-zinc-200 px-5 text-sm font-medium text-zinc-400 dark:border-zinc-800 dark:text-zinc-500">
-                Next
+                ถัดไป
               </span>
             )}
           </div>

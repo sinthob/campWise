@@ -99,17 +99,17 @@ export default async function CampgroundsPage(props: {
     <div className="min-h-screen bg-background px-4 py-10 text-foreground">
       <div className="mx-auto w-full max-w-6xl">
         <header className="mb-8">
-          <h1 className="text-3xl font-semibold tracking-tight">Campgrounds</h1>
+          <h1 className="text-3xl font-semibold tracking-tight">ลานกางเต็นท์</h1>
           <p className="mt-2 max-w-2xl text-sm text-foreground/70">
-            Discover camping spots from our Airtable directory.
+            ค้นหาลานกางเต็นท์จาก Airtable ของเรา
           </p>
         </header>
 
         <ListFilters
           basePath="/campgrounds"
-          searchPlaceholder="Search campgrounds..."
-          typeLabel="Type"
-          typePlaceholder="All types"
+          searchPlaceholder="ค้นหาลานกางเต็นท์..."
+          typeLabel="ประเภท"
+          typePlaceholder="ทุกประเภท"
           typeOptions={typeOptions}
         />
 
@@ -118,7 +118,7 @@ export default async function CampgroundsPage(props: {
             const name =
               record.fields["Name Campground"] ??
               record.fields["Name"] ??
-              "Unnamed Campground";
+              "ลานกางเต็นท์ (ไม่มีชื่อ)";
 
             const imageUrl = getAnyAttachmentImageUrl(record.fields);
 
@@ -153,7 +153,7 @@ export default async function CampgroundsPage(props: {
                 key={record.id}
                 typePath="campground"
                 id={record.id}
-                badge="Campground"
+                badge="แคมป์"
                 title={String(name)}
                 subtitle={location}
                 image={imageUrl}
@@ -165,7 +165,7 @@ export default async function CampgroundsPage(props: {
 
         <nav className="mt-10 flex items-center justify-between">
           <div className="text-sm text-zinc-600 dark:text-zinc-400">
-            Page {page}
+            หน้า {page}
           </div>
           <div className="flex gap-3">
             {prevHref ? (
@@ -173,11 +173,11 @@ export default async function CampgroundsPage(props: {
                 href={prevHref}
                 className="inline-flex h-10 items-center justify-center rounded-full border border-zinc-200 bg-white px-5 text-sm font-medium text-zinc-900 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50 dark:hover:bg-zinc-900"
               >
-                Previous
+                ก่อนหน้า
               </Link>
             ) : (
               <span className="inline-flex h-10 items-center justify-center rounded-full border border-zinc-200 px-5 text-sm font-medium text-zinc-400 dark:border-zinc-800 dark:text-zinc-500">
-                Previous
+                ก่อนหน้า
               </span>
             )}
 
@@ -186,11 +186,11 @@ export default async function CampgroundsPage(props: {
                 href={nextHref}
                 className="inline-flex h-10 items-center justify-center rounded-full border border-zinc-200 bg-white px-5 text-sm font-medium text-zinc-900 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50 dark:hover:bg-zinc-900"
               >
-                Next
+                ถัดไป
               </Link>
             ) : (
               <span className="inline-flex h-10 items-center justify-center rounded-full border border-zinc-200 px-5 text-sm font-medium text-zinc-400 dark:border-zinc-800 dark:text-zinc-500">
-                Next
+                ถัดไป
               </span>
             )}
           </div>

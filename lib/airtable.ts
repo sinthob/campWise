@@ -11,7 +11,6 @@ type AirtableAttachment = {
 
 // Bundled mock data fallback (useful on serverless where file tracing may omit
 // runtime-read JSON files).
-// eslint-disable-next-line @typescript-eslint/consistent-type-imports
 import bundledMockData from "@/mock/airtable.json";
 
 export type AirtableRecord<TFields extends Record<string, unknown>> = {
@@ -208,7 +207,7 @@ async function fetchMockTablePage<TFields extends Record<string, unknown>>(
   try {
     const raw = await readFile(resolvedPath, "utf8");
     data = JSON.parse(raw) as AirtableMockFile;
-  } catch (err) {
+  } catch {
     // Fallback to bundled JSON if runtime fs access isn't available.
     data = getBundledMockFile();
   }
@@ -432,7 +431,7 @@ async function fetchMockRecordById<TFields extends Record<string, unknown>>(
   try {
     const raw = await readFile(resolvedPath, "utf8");
     data = JSON.parse(raw) as AirtableMockFile;
-  } catch (err) {
+  } catch {
     data = getBundledMockFile();
   }
 

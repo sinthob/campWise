@@ -62,7 +62,7 @@ export default function CampgroundCard({
             />
           ) : (
             <div className="flex h-full w-full items-center justify-center text-sm text-sand/70">
-              No image
+              ไม่มีรูป
             </div>
           )}
         </div>
@@ -75,7 +75,7 @@ export default function CampgroundCard({
 
           {summary ? (
             <div className="mt-5 rounded-xl border border-moss/50 bg-moss/25 p-4">
-              <p className="text-sm font-semibold">🤖 AI Summary</p>
+              <p className="text-sm font-semibold">🤖 สรุปโดย AI</p>
               <p className="mt-2 text-sm leading-6 text-sand/80">{summary}</p>
             </div>
           ) : null}
@@ -90,7 +90,7 @@ export default function CampgroundCard({
             className="inline-flex items-center gap-2 text-sm font-medium text-accent"
             aria-expanded={open}
           >
-            ดู Raw Review
+            ดูรีวิวต้นฉบับ
             <ChevronDownIcon
               className={`h-4 w-4 transition-transform ${open ? "rotate-180" : ""}`}
             />

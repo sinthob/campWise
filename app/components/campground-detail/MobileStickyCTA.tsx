@@ -55,7 +55,7 @@ export default function MobileStickyCTA(props: {
     <div
       className="fixed inset-x-0 bottom-0 z-50 border-t border-zinc-200 bg-white/95 px-4 py-3 backdrop-blur md:hidden dark:border-moss/30 dark:bg-forest/95"
       role="region"
-      aria-label="Actions"
+      aria-label="การดำเนินการ"
     >
       <div className="mx-auto flex w-full max-w-6xl items-center gap-3">
         <button
@@ -64,7 +64,7 @@ export default function MobileStickyCTA(props: {
           aria-pressed={saved}
           className="inline-flex h-11 flex-[2] items-center justify-center rounded-full bg-accent px-5 text-sm font-semibold text-forest hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
-          {saved ? "Saved" : "Save"}
+          {saved ? "บันทึกแล้ว" : "บันทึก"}
         </button>
 
         <a
@@ -73,7 +73,7 @@ export default function MobileStickyCTA(props: {
           rel="noreferrer"
           className="inline-flex h-11 flex-1 items-center justify-center rounded-full border border-zinc-200 bg-white px-4 text-sm font-semibold text-foreground hover:border-primary/30 hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent dark:border-transparent dark:bg-forest dark:text-sand dark:ring-1 dark:ring-moss/30 dark:hover:bg-forest/80"
         >
-          Maps
+          แผนที่
         </a>
 
         <button
@@ -81,7 +81,7 @@ export default function MobileStickyCTA(props: {
           onClick={share}
           className="inline-flex h-11 flex-1 items-center justify-center rounded-full border border-zinc-200 bg-white px-4 text-sm font-semibold text-foreground hover:border-primary/30 hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent dark:border-transparent dark:bg-forest dark:text-sand dark:ring-1 dark:ring-moss/30 dark:hover:bg-forest/80"
         >
-          {shared ? "Shared" : "Share"}
+          {shared ? "แชร์แล้ว" : "แชร์"}
         </button>
       </div>
     </div>
