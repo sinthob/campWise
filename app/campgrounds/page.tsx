@@ -99,7 +99,9 @@ export default async function CampgroundsPage(props: {
     <div className="min-h-screen bg-background px-4 py-10 text-foreground">
       <div className="mx-auto w-full max-w-6xl">
         <header className="mb-8">
-          <h1 className="text-3xl font-semibold tracking-tight">ลานกางเต็นท์</h1>
+          <h1 className="text-3xl font-semibold tracking-tight">
+            ลานกางเต็นท์
+          </h1>
           <p className="mt-2 max-w-2xl text-sm text-foreground/70">
             ค้นหาลานกางเต็นท์จาก Airtable ของเรา
           </p>

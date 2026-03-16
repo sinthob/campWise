@@ -31,8 +31,8 @@ export default async function Home() {
               CampWise
             </h1>
             <p className="mx-auto mt-4 max-w-2xl text-base font-medium leading-7 text-white/85 sm:text-lg">
-              ค้นหาลานกางเต็นท์ จัดลิสต์อุปกรณ์ให้พร้อม และเรียนรู้เคล็ดลับ &amp;
-              ทริคสำหรับสายแคมป์
+              ค้นหาลานกางเต็นท์ จัดลิสต์อุปกรณ์ให้พร้อม และเรียนรู้เคล็ดลับ
+              &amp; ทริคสำหรับสายแคมป์
             </p>
 
             <form

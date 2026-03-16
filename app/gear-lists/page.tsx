@@ -93,7 +93,8 @@ export default async function GearListsPage(props: {
 
         <section className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {records.map((record) => {
-            const setName = record.fields["Set Name"] ?? "ชุดอุปกรณ์ (ไม่มีชื่อ)";
+            const setName =
+              record.fields["Set Name"] ?? "ชุดอุปกรณ์ (ไม่มีชื่อ)";
             const tip = record.fields["AI Gear Tip"] ?? "";
             const imageUrl = getFirstAttachmentUrl(record.fields["Gear Image"]);
             const excerpt = toExcerpt(tip, 160);
