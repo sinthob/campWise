@@ -1,6 +1,4 @@
-import Link from "next/link";
-
-import CommunityReviewStatus from "@/app/components/campground-detail/CommunityReviewStatus";
+﻿import Link from "next/link";
 
 import {
   fetchAirtableRecordById,
@@ -107,7 +105,6 @@ const TYPE_CONFIG: Record<DetailType, TypeConfig> = {
     locationKeys: ["Type", "Category"],
     imageKeys: ["Gear Image", "Image", "Images", "Photo", "Photos"],
     aiSummaryKeys: [
-      "AI Description",
       "AI Gear Tip",
       "AI Summary",
       "AI Insight",
@@ -116,29 +113,12 @@ const TYPE_CONFIG: Record<DetailType, TypeConfig> = {
     ],
     rawReviewKeys: ["Raw Review", "Raw Reviews", "Reviews", "Review", "Notes"],
     insightKeys: {
-      strengths: ["AI pros", "AI Pros", "Strengths", "Pros"],
-      weaknesses: ["AI cons", "AI Cons", "Weaknesses", "Cons"],
-      bestFor: [
-        "AI use case",
-        "AI Use Case",
-        "AI use cases",
-        "AI Use Cases",
-        "Best for",
-        "Best For",
-        "Suitable for",
-      ],
-      tips: ["AI Gear Tip", "AI Description", "Tips", "Recommendations"],
+      strengths: ["Strengths", "Pros"],
+      weaknesses: ["Weaknesses", "Cons"],
+      bestFor: ["Best for", "Best For", "Suitable for"],
+      tips: ["AI Gear Tip", "Tips", "Recommendations"],
     },
     quickFactsExclude: [
-      "AI Description",
-      "AI pros",
-      "AI Pros",
-      "AI cons",
-      "AI Cons",
-      "AI use case",
-      "AI Use Case",
-      "AI use cases",
-      "AI Use Cases",
       "AI Gear Tip",
       "AI Summary",
       "AI Insight",
@@ -282,7 +262,7 @@ function toStringListFromUnknown(value: unknown): string[] {
 
   // Split on newlines and common bullet prefixes.
   const parts = normalized
-    .split(/\n|\u2022/g)
+    .split(/\n|•|\u2022/g)
     .flatMap((p) => p.split(/^\s*[-*]\s*/m))
     .map((p) => p.trim())
     .filter(Boolean);
@@ -326,7 +306,7 @@ function toShortStringFromUnknown(value: unknown): string {
 
   if (typeof value === "string") return value.trim();
   if (typeof value === "number") return String(value);
-  if (typeof value === "boolean") return value ? "ใช่" : "ไม่ใช่";
+  if (typeof value === "boolean") return value ? "Yes" : "No";
 
   if (Array.isArray(value)) {
     const parts = value
@@ -336,7 +316,7 @@ function toShortStringFromUnknown(value: unknown): string {
           : typeof v === "number"
             ? [String(v)]
             : typeof v === "boolean"
-              ? [v ? "ใช่" : "ไม่ใช่"]
+              ? [v ? "Yes" : "No"]
               : [],
       )
       .filter(Boolean);
@@ -396,7 +376,7 @@ function parseMonthBadges(raw: string): string[] {
   if (!normalized) return [];
 
   const parts = normalized
-    .split(/\n|,|\/|\u2022/g)
+    .split(/\n|,|\/|\u2022|•/g)
     .map((p) => p.trim())
     .filter(Boolean);
 
@@ -503,7 +483,7 @@ function toExcerpt(raw: string, maxChars: number): string {
   const s = raw.replace(/\s+/g, " ").trim();
   if (!s) return "";
   if (s.length <= maxChars) return s;
-  return `${s.slice(0, Math.max(0, maxChars - 1)).trimEnd()}\u2026`;
+  return `${s.slice(0, Math.max(0, maxChars - 1)).trimEnd()}…`;
 }
 
 function splitParagraphs(raw: string): string[] {
@@ -522,7 +502,7 @@ function extractBulletLines(raw: string): string[] {
   for (const line of lines) {
     const trimmed = line.trim();
     if (!trimmed) continue;
-    const m = trimmed.match(/^(?:[-*]|\u2022)\s+(.*)$/);
+    const m = trimmed.match(/^(?:[-*]|•|\u2022)\s+(.*)$/);
     if (m?.[1]) out.push(m[1].trim());
   }
 
@@ -589,7 +569,7 @@ function parseGuideSections(raw: string): {
   const normalizeHeading = (s: string) =>
     s
       .replace(/^#+\s*/, "")
-      .replace(/[:：]+$/, "")
+      .replace(/[:：]$/, "")
       .trim()
       .toLowerCase();
 
@@ -746,7 +726,7 @@ export default async function DynamicDetailPage(props: {
             href={cfg.listHref}
             className="text-sm font-medium text-foreground/80 hover:text-accent"
           >
-            Back
+            ← Back
           </Link>
 
           <h1 className="mt-6 text-2xl font-semibold tracking-tight">
@@ -822,8 +802,8 @@ export default async function DynamicDetailPage(props: {
     const rainySeasonText =
       typeof rainySeasonValue === "boolean"
         ? rainySeasonValue
-          ? "ใช่"
-          : "ไม่ใช่"
+          ? "แนะนำ"
+          : "ไม่แนะนำ"
         : toShortStringFromUnknown(rainySeasonValue);
 
     const elevationValue =
@@ -831,7 +811,7 @@ export default async function DynamicDetailPage(props: {
       record.fields["Elevation (m)"] ??
       record.fields["Altitude"] ??
       record.fields["Altitude (m)"] ??
-      undefined;
+      record.fields["ความสูง"];
     const elevationTextRaw = toShortStringFromUnknown(elevationValue);
     const elevationText = elevationTextRaw
       ? /m\b/i.test(elevationTextRaw)
@@ -843,7 +823,7 @@ export default async function DynamicDetailPage(props: {
       record.fields["Highlight Facts"] ??
       record.fields["Highlights"] ??
       record.fields["Highlight"] ??
-      undefined;
+      record.fields["จุดเด่น"];
     const highlightFacts = toStringListFromUnknown(highlightFactsRaw);
     const highlightFogText = highlightFacts[0];
     const highlightSunriseText = highlightFacts[1];
@@ -851,12 +831,12 @@ export default async function DynamicDetailPage(props: {
     const quickInfoItems = [
       location ? { icon: "📍", label: "Location", value: location } : null,
       {
-        icon: "⏱️",
+        icon: "🚗",
         label: "Travel time",
         value: travelTimeText,
       },
       {
-        icon: "🌙",
+        icon: "🌡",
         label: "Night temp",
         value: nightTempText,
       },
@@ -868,7 +848,7 @@ export default async function DynamicDetailPage(props: {
         ),
       },
       {
-        icon: "🚽",
+        icon: "🚻",
         label: "Toilet",
         value: toShortStringFromUnknown(
           record.fields["Toilet availability"] ?? record.fields["Toilet"],
@@ -887,7 +867,7 @@ export default async function DynamicDetailPage(props: {
         ),
       },
       {
-        icon: "🥾",
+        icon: "⭐",
         label: "Difficulty",
         value: toShortStringFromUnknown(
           record.fields["Difficulty level"] ?? record.fields["Difficulty"],
@@ -925,7 +905,7 @@ export default async function DynamicDetailPage(props: {
       record.fields["Packing List"];
     const gearItems = toStringListFromUnknown(gearSuggestionRaw);
 
-    // Recommended gear types (AI-filled): e.g. "Stove", "Rain jacket".
+    // Recommended gear types (AI-filled): e.g. "อุปกรณ์กันหนาว", "เต็นท์".
     const recommendedGearTypesRaw =
       record.fields["Recommended Gear"] ??
       record.fields["Recommended Gear Types"] ??
@@ -1002,7 +982,7 @@ export default async function DynamicDetailPage(props: {
               href={cfg.listHref}
               className="text-sm font-medium text-slate-700 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent dark:text-sand/80 dark:hover:text-accent"
             >
-              Back
+              ← Back
             </Link>
           </nav>
 
@@ -1076,8 +1056,6 @@ export default async function DynamicDetailPage(props: {
             <BestSeason months={bestSeasonMonths} rating={bestSeasonRating} />
             <GearSuggestion recordId={id} items={gearItems} />
           </section>
-
-          <CommunityReviewStatus />
         </div>
 
         <MobileStickyCTA recordId={id} title={title} mapsUrl={mapsUrl} />
@@ -1108,6 +1086,11 @@ export default async function DynamicDetailPage(props: {
   const bestForList = parsedInsight?.bestFor?.length
     ? parsedInsight.bestFor
     : toStringListFromUnknown(bestFor);
+  const tipsList = parsedInsight?.tips?.length
+    ? parsedInsight.tips
+    : toStringListFromUnknown(
+        tips ?? (aiSummaryLooksJson ? undefined : fallbackAiSummary),
+      );
 
   const createdDateText = record.createdTime
     ? new Date(record.createdTime).toLocaleDateString("en-US", {
@@ -1211,20 +1194,6 @@ export default async function DynamicDetailPage(props: {
 
     const heroSummary = guide.summary || heroDescriptionText;
 
-    const gearNeedItems = toStringListFromUnknown(
-      record.fields["Gear Need"] ??
-        record.fields["Gear need"] ??
-        record.fields["Gear Needed"] ??
-        record.fields["Gear needs"],
-    );
-
-    const commonMistakesItems = toStringListFromUnknown(
-      record.fields["Common Mistakes"] ??
-        record.fields["Common mistakes"] ??
-        record.fields["Common Mistake"] ??
-        record.fields["Mistakes"],
-    );
-
     const recommendedGearRaw =
       record.fields["Recommended Gear"] ??
       record.fields["Recommended gear"] ??
@@ -1242,7 +1211,7 @@ export default async function DynamicDetailPage(props: {
         const id = m[0];
         const label = token
           .replace(id, "")
-          .replace(/[()\-\u2013\u2014:]+/g, " ")
+          .replace(/[()\-–—:]+/g, " ")
           .trim();
         return { id, label: label || "Gear item" };
       })
@@ -1255,7 +1224,7 @@ export default async function DynamicDetailPage(props: {
             href={cfg.listHref}
             className="text-sm font-medium text-foreground/80 hover:text-accent"
           >
-            Back
+            ← Back
           </Link>
 
           {/* Hero */}
@@ -1339,46 +1308,67 @@ export default async function DynamicDetailPage(props: {
             )}
           </section>
 
-          {/* Gear Need */}
+          {/* Step-by-step Guide */}
           <section className="rounded-3xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-moss/30 dark:bg-forest">
             <header className="space-y-1">
-              <h2 className="text-base font-semibold">Gear Need</h2>
+              <h2 className="text-base font-semibold">Step-by-step Guide</h2>
               <p className="text-xs leading-5 text-foreground/60">
-                Items that help you do this tip.
+                Follow these steps in order.
               </p>
             </header>
 
-            {gearNeedItems.length > 0 ? (
-              <ul className="mt-4 list-disc space-y-2 pl-5 text-sm leading-6 text-foreground/80">
-                {gearNeedItems.slice(0, 10).map((item, idx) => (
-                  <li key={`${idx}-${item}`}>{item}</li>
+            {guide.steps.length > 0 ? (
+              <ol className="mt-4 space-y-3">
+                {guide.steps.slice(0, 8).map((step, idx) => (
+                  <li
+                    key={`${idx}-${step.title}`}
+                    className="rounded-2xl bg-white p-4 ring-1 ring-zinc-200/80 shadow-sm dark:bg-forest/60 dark:ring-moss/30"
+                  >
+                    <div className="flex gap-4">
+                      <div className="flex h-9 w-9 flex-none items-center justify-center rounded-full bg-zinc-100 text-sm font-semibold text-zinc-900 ring-1 ring-zinc-200 dark:bg-moss/40 dark:text-sand dark:ring-moss/40">
+                        {idx + 1}
+                      </div>
+
+                      <div className="min-w-0">
+                        <h3 className="text-sm font-semibold">{step.title}</h3>
+                        {step.body ? (
+                          <p className="mt-1 whitespace-pre-line text-sm leading-6 text-foreground/70">
+                            {step.body}
+                          </p>
+                        ) : null}
+                      </div>
+                    </div>
+                  </li>
                 ))}
-              </ul>
+              </ol>
             ) : (
               <p className="mt-4 text-sm leading-6 text-foreground/60">
-                No gear listed yet.
+                No steps available yet.
               </p>
             )}
           </section>
 
-          {/* Common Mistakes */}
+          {/* Pro Tips */}
           <section className="rounded-3xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-moss/30 dark:bg-forest">
             <header className="space-y-1">
-              <h2 className="text-base font-semibold">Common Mistakes</h2>
+              <h2 className="text-base font-semibold">Pro Tips</h2>
               <p className="text-xs leading-5 text-foreground/60">
-                Pitfalls to avoid when applying this tip.
+                Extra advice that makes the difference.
               </p>
             </header>
 
-            {commonMistakesItems.length > 0 ? (
-              <ul className="mt-4 list-disc space-y-2 pl-5 text-sm leading-6 text-foreground/80">
-                {commonMistakesItems.slice(0, 10).map((item, idx) => (
-                  <li key={`${idx}-${item}`}>{item}</li>
+            {guide.proTips.length > 0 ? (
+              <ul className="mt-4 space-y-2 text-sm leading-6 text-foreground/80">
+                {guide.proTips.slice(0, 8).map((item, idx) => (
+                  <li key={`${idx}-${item}`} className="flex gap-2">
+                    <span className="mt-[2px] text-accent">•</span>
+                    <span>{item}</span>
+                  </li>
                 ))}
               </ul>
             ) : (
               <p className="mt-4 text-sm leading-6 text-foreground/60">
-                No mistakes listed yet.
+                No pro tips available yet.
               </p>
             )}
           </section>
@@ -1418,140 +1408,192 @@ export default async function DynamicDetailPage(props: {
           href={cfg.listHref}
           className="text-sm font-medium text-foreground/80 hover:text-accent"
         >
-          Back
+          ← Back
         </Link>
 
-        {/* Hero: image + product summary */}
-        <section className="mt-6 rounded-3xl border border-zinc-200 bg-white dark:border-moss/30 dark:bg-forest">
-          <div className="p-6">
-            {createdDateText ? (
-              <div className="flex justify-end text-xs font-medium text-foreground/60">
-                อัปเดตเมื่อ {createdDateText}
-              </div>
-            ) : null}
-
-            <div className="mt-4 grid grid-cols-1 gap-8 lg:grid-cols-2 lg:items-start">
-              <div className="overflow-hidden rounded-2xl bg-zinc-100 ring-1 ring-zinc-200 dark:bg-moss dark:ring-moss/40">
-                <div className="aspect-[4/3] w-full">
-                  {imageUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={imageUrl}
-                      alt={title}
-                      className="h-full w-full object-cover"
-                      loading="lazy"
-                    />
-                  ) : (
-                    <div className="flex h-full w-full items-center justify-center text-sm text-zinc-500 dark:text-sand/70">
-                      No image
-                    </div>
-                  )}
+        {/* ─── Hero: horizontal dark-green card ─── */}
+        <section className="mt-6 overflow-hidden rounded-3xl bg-forest text-sand shadow-lg ring-1 ring-moss/40">
+          <div className="flex flex-col md:flex-row md:items-stretch">
+            {/* Left: product image (40%) */}
+            <div className="relative w-full shrink-0 overflow-hidden bg-moss/30 md:w-[40%]">
+              {imageUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={imageUrl}
+                  alt={title}
+                  className="h-full min-h-[240px] w-full object-cover"
+                  loading="lazy"
+                />
+              ) : (
+                <div className="flex h-full min-h-[240px] w-full items-center justify-center text-sm text-sand/50">
+                  No image
                 </div>
-              </div>
+              )}
+            </div>
 
-              <div className="min-w-0">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="inline-flex items-center rounded-full bg-zinc-100 px-3 py-1 text-xs font-semibold text-zinc-900 dark:bg-moss/40 dark:text-sand">
-                    {cfg.badge}
+            {/* Right: content column */}
+            <div className="flex min-w-0 flex-1 flex-col gap-4 p-5 sm:p-7">
+              {/* Badge + date */}
+              <div className="flex items-start justify-between gap-2">
+                <span className="inline-flex items-center rounded-full bg-moss/50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-sand">
+                  {cfg.badge}
+                </span>
+                {createdDateText && (
+                  <span className="text-xs text-sand/50">
+                    เพิ่มข้อมูลเมื่อ {createdDateText}
                   </span>
+                )}
+              </div>
 
-                  {location ? (
-                    <span className="inline-flex items-center rounded-full border border-zinc-200 bg-white px-3 py-1 text-xs font-semibold text-foreground/80 dark:border-moss/30 dark:bg-forest/60 dark:text-sand/80">
-                      {location}
-                    </span>
-                  ) : null}
-                </div>
+              {/* Title */}
+              <h1 className="text-2xl font-bold leading-tight tracking-tight text-sand sm:text-3xl">
+                {title}
+              </h1>
 
-                <h1 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
-                  {title}
-                </h1>
-
+              {/* Category */}
               {(() => {
-                const capacityText = pickValue(record.fields, [
-                  "Capacity",
-                  "People",
-                  "Sleeps",
-                  "Sleeps (people)",
-                  "Persons",
-                  "Person",
-                ]);
-                const categoryText = pickValue(record.fields, [
-                  "Category",
-                  "Gear Type",
-                  "Type",
-                  "Gear Category",
-                ]);
-                const weatherSuitabilityText = seasonText;
-
-                const attrs = [
-                  capacityText
-                    ? { icon: "👥", label: "Capacity", value: capacityText }
-                    : null,
-                  categoryText || location
-                    ? {
-                        icon: "🏷️",
-                        label: "Category",
-                        value: categoryText || location,
-                      }
-                    : null,
-                  weightText
-                    ? { icon: "⚖️", label: "Weight", value: weightText }
-                    : null,
-                  weatherSuitabilityText
-                    ? {
-                        icon: "🌦️",
-                        label: "Weather",
-                        value: weatherSuitabilityText,
-                      }
-                    : null,
-                ].filter(Boolean) as Array<{
-                  icon: string;
-                  label: string;
-                  value: string;
-                }>;
-
-                if (attrs.length === 0) return null;
-
+                const cat =
+                  pickValue(record.fields, [
+                    "Category",
+                    "Gear Type",
+                    "Type",
+                    "Gear Category",
+                  ]) || location;
+                if (!cat) return null;
                 return (
-                  <div className="mt-4 flex flex-wrap gap-3">
-                    {attrs.map((a) => (
-                      <div
-                        key={a.label}
-                        className="inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-white px-4 py-2 text-sm font-medium text-foreground dark:border-moss/30 dark:bg-forest/60 dark:text-sand"
-                      >
-                        <span aria-hidden="true">{a.icon}</span>
-                        <span className="text-foreground/70 dark:text-sand/70">
-                          {a.label}:
-                        </span>
-                        <span className="font-semibold">{a.value}</span>
-                      </div>
-                    ))}
+                  <div className="flex items-center gap-2 text-sm">
+                    <span
+                      className="h-2.5 w-2.5 flex-none rounded-full bg-accent"
+                      aria-hidden="true"
+                    />
+                    <span className="text-sand/60">Category:</span>
+                    <span className="font-semibold text-sand">{cat}</span>
                   </div>
                 );
               })()}
 
-                {(() => {
-                  const verdictRaw =
-                    heroDescriptionText ||
-                    tipsJson?.summaryText ||
-                    strengthsList[0] ||
-                    "";
-                  const fallbackCon = weaknessesList[0]
-                    ? ` Trade-off: ${weaknessesList[0]}`
-                    : "";
-                  const verdict = verdictRaw
-                    ? `${toExcerpt(verdictRaw, 220)}${fallbackCon}`.trim()
-                    : "";
-                  if (!verdict) return null;
+              {/* AI Verdict */}
+              {(() => {
+                const verdictMain = heroDescriptionText
+                  ? toExcerpt(heroDescriptionText, 220)
+                  : tipsJson?.summaryText
+                    ? toExcerpt(tipsJson.summaryText, 220)
+                    : strengthsList[0]
+                      ? toExcerpt(strengthsList[0], 220)
+                      : "";
+                const tradeOff = weaknessesList[0] ?? "";
+                if (!verdictMain && !tradeOff) return null;
+                return (
+                  <div>
+                    <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-widest text-sand/40">
+                      AI Verdict
+                    </p>
+                    <p className="text-sm leading-6 text-sand/80">
+                      {verdictMain}
+                      {tradeOff && (
+                        <>
+                          {verdictMain ? " " : ""}
+                          <span className="font-semibold text-accent">
+                            Trade-off:
+                          </span>{" "}
+                          {tradeOff}
+                        </>
+                      )}
+                    </p>
+                  </div>
+                );
+              })()}
 
+              {/* Suitable For + price buttons */}
+              <div className="mt-auto pt-2">
+                <p className="mb-3 text-[10px] font-semibold uppercase tracking-widest text-sand/40">
+                  Suitable For
+                </p>
+                {(() => {
+                  const shopeeRaw =
+                    record.fields["Shopee Link"] ?? record.fields["Shopee"];
+                  const shopeeLink =
+                    typeof shopeeRaw === "string" && shopeeRaw.trim()
+                      ? shopeeRaw.trim()
+                      : Array.isArray(shopeeRaw)
+                        ? (shopeeRaw.find(
+                            (v: unknown): v is string => typeof v === "string",
+                          ) ?? null)
+                        : null;
+                  const lazadaRaw =
+                    record.fields["Lazada Link"] ?? record.fields["Lazada"];
+                  const lazadaLink =
+                    typeof lazadaRaw === "string" && lazadaRaw.trim()
+                      ? lazadaRaw.trim()
+                      : Array.isArray(lazadaRaw)
+                        ? (lazadaRaw.find(
+                            (v: unknown): v is string => typeof v === "string",
+                          ) ?? null)
+                        : null;
+                  const productRaw = record.fields["Product Link"];
+                  const productLink =
+                    typeof productRaw === "string" && productRaw.trim()
+                      ? productRaw.trim()
+                      : Array.isArray(productRaw)
+                        ? (productRaw.find(
+                            (v: unknown): v is string => typeof v === "string",
+                          ) ?? null)
+                        : null;
                   return (
-                    <div className="mt-5">
-                      <div className="text-xs font-semibold uppercase tracking-wide text-foreground/60">
-                        AI Verdict
-                      </div>
-                      <p className="mt-2 max-w-xl text-sm leading-6 text-foreground/80">
-                        {verdict}
-                      </p>
+                    <div className="flex flex-wrap gap-3">
+                      {shopeeLink && (
+                        <a
+                          href={shopeeLink}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-bold text-white shadow hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-4 w-4 shrink-0"
+                            viewBox="0 0 24 24"
+                            fill="currentColor"
+                            aria-hidden="true"
+                          >
+                            <path d="M19 7h-1.586l-2.707-2.707A1 1 0 0014 4H10a1 1 0 00-.707.293L6.586 7H5a2 2 0 00-2 2v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2zm-9-.586L11.414 5h1.172L14 6.414V7h-4v-.586zM5 9h14v2H5V9zm0 10v-6h14v6H5z" />
+                          </svg>
+                          CHECK PRICE AT SHOPEE
+                        </a>
+                      )}
+                      {lazadaLink && (
+                        <a
+                          href={lazadaLink}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-bold text-white shadow hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-4 w-4 shrink-0"
+                            viewBox="0 0 24 24"
+                            fill="currentColor"
+                            aria-hidden="true"
+                          >
+                            <path d="M17.63 5.84C17.27 5.33 16.67 5 16 5L5 5.01C3.9 5.01 3 5.9 3 7v10c0 1.1.9 1.99 2 1.99L16 19c.67 0 1.27-.33 1.63-.84L22 12l-4.37-6.16z" />
+                          </svg>
+                          CHECK PRICE AT LAZADA
+                        </a>
+                      )}
+                      {!shopeeLink && !lazadaLink && productLink && (
+                        <a
+                          href={productLink}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-bold text-white shadow hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                        >
+                          เปิดหน้าสินค้า
+                        </a>
+                      )}
+                      {!shopeeLink && !lazadaLink && !productLink && (
+                        <p className="text-sm text-sand/50">
+                          ยังไม่มีลิงก์สินค้า
+                        </p>
+                      )}
                     </div>
                   );
                 })()}
@@ -1559,7 +1601,6 @@ export default async function DynamicDetailPage(props: {
             </div>
           </div>
         </section>
-
         {/* Product Details */}
         <section aria-label="Product details" className="mt-16 space-y-4">
           <header className="space-y-1">
@@ -1601,13 +1642,6 @@ export default async function DynamicDetailPage(props: {
               "Person",
             ]);
 
-            const productLinkText = pickValue(record.fields, ["Product Link"]);
-            const productLinkHref = productLinkText
-              ? /^[a-z]+:\/\//i.test(productLinkText)
-                ? productLinkText
-                : `https://${productLinkText}`
-              : "";
-
             const items = [
               brandText ? { label: "Brand", value: brandText } : null,
               modelText ? { label: "Model", value: modelText } : null,
@@ -1617,20 +1651,7 @@ export default async function DynamicDetailPage(props: {
               capacityText ? { label: "Capacity", value: capacityText } : null,
               weightText ? { label: "Weight", value: weightText } : null,
               seasonText ? { label: "Season", value: seasonText } : null,
-              productLinkText
-                ? {
-                    label: "Product Link",
-                    value: "Open product page",
-                    href: productLinkHref,
-                    raw: productLinkText,
-                  }
-                : null,
-            ].filter(Boolean) as Array<{
-              label: string;
-              value: string;
-              href?: string;
-              raw?: string;
-            }>;
+            ].filter(Boolean) as Array<{ label: string; value: string }>;
 
             if (items.length === 0) {
               return (
@@ -1651,25 +1672,7 @@ export default async function DynamicDetailPage(props: {
                       {it.label}
                     </div>
                     <div className="mt-1 text-sm font-semibold text-foreground dark:text-sand">
-                      {it.href ? (
-                        <>
-                          <a
-                            href={it.href}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="text-accent hover:underline"
-                          >
-                            {it.value}
-                          </a>
-                          {it.raw ? (
-                            <div className="mt-2 break-all text-xs font-normal text-foreground/60">
-                              {it.raw}
-                            </div>
-                          ) : null}
-                        </>
-                      ) : (
-                        it.value
-                      )}
+                      {it.value}
                     </div>
                   </div>
                 ))}
@@ -1691,10 +1694,10 @@ export default async function DynamicDetailPage(props: {
           }
 
           return (
-            <section aria-label="ข้อดี ข้อเสีย และการใช้งาน" className="mt-16 space-y-6">
+            <section aria-label="รายละเอียดเพิ่มเติม" className="mt-16 space-y-6">
               <header className="space-y-1">
                 <h2 className="text-xl font-semibold tracking-tight">
-                  ข้อดี ข้อเสีย และการใช้งาน
+                  รายละเอียดเพิ่มเติม
                 </h2>
               </header>
 
@@ -1712,13 +1715,13 @@ export default async function DynamicDetailPage(props: {
                     </ul>
                   ) : (
                     <p className="mt-3 text-sm text-foreground/60">
-                      ยังไม่มีรายการข้อดี
+                      No pros listed.
                     </p>
                   )}
                 </div>
 
                 <div className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-moss/30 dark:bg-forest/60">
-                  <h3 className="text-base font-semibold">ข้อเสีย</h3>
+                  <h3 className="text-base font-semibold">ข้อจำกัด</h3>
                   {cons.length > 0 ? (
                     <ul className="mt-4 space-y-2 text-sm leading-6 text-foreground/80">
                       {cons.slice(0, 10).map((item, idx) => (
@@ -1730,7 +1733,7 @@ export default async function DynamicDetailPage(props: {
                     </ul>
                   ) : (
                     <p className="mt-3 text-sm text-foreground/60">
-                      ยังไม่มีรายการข้อเสีย
+                      No cons listed.
                     </p>
                   )}
                 </div>
