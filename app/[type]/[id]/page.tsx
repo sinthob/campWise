@@ -105,6 +105,7 @@ const TYPE_CONFIG: Record<DetailType, TypeConfig> = {
     locationKeys: ["Type", "Category"],
     imageKeys: ["Gear Image", "Image", "Images", "Photo", "Photos"],
     aiSummaryKeys: [
+      "AI Description",
       "AI Gear Tip",
       "AI Summary",
       "AI Insight",
@@ -113,9 +114,9 @@ const TYPE_CONFIG: Record<DetailType, TypeConfig> = {
     ],
     rawReviewKeys: ["Raw Review", "Raw Reviews", "Reviews", "Review", "Notes"],
     insightKeys: {
-      strengths: ["Strengths", "Pros"],
-      weaknesses: ["Weaknesses", "Cons"],
-      bestFor: ["Best for", "Best For", "Suitable for"],
+      strengths: ["AI pros", "Strengths", "Pros"],
+      weaknesses: ["AI cons", "Weaknesses", "Cons"],
+      bestFor: ["AI use case", "Best for", "Best For", "Suitable for"],
       tips: ["AI Gear Tip", "Tips", "Recommendations"],
     },
     quickFactsExclude: [
@@ -156,9 +157,9 @@ const TYPE_CONFIG: Record<DetailType, TypeConfig> = {
     aiSummaryKeys: ["AI Summary", "AI Insight", "Summary"],
     rawReviewKeys: ["Raw Review", "Raw Reviews", "Reviews", "Review", "Notes"],
     insightKeys: {
-      strengths: ["Strengths", "Pros"],
-      weaknesses: ["Weaknesses", "Cons"],
-      bestFor: ["Best for", "Best For", "Suitable for"],
+      strengths: ["AI pros", "Strengths", "Pros"],
+      weaknesses: ["AI cons", "Weaknesses", "Cons"],
+      bestFor: ["AI use case", "Best for", "Best For", "Suitable for"],
       tips: ["Tips", "Recommendations", "Content"],
     },
     quickFactsExclude: [
@@ -1511,7 +1512,7 @@ export default async function DynamicDetailPage(props: {
                 </p>
                 {(() => {
                   const shopeeRaw =
-                    record.fields["Shopee Link"] ?? record.fields["Shopee"];
+                    record.fields["Shoppee Affiliate Link"] ?? record.fields["Shopee Link"] ?? record.fields["Shopee"];
                   const shopeeLink =
                     typeof shopeeRaw === "string" && shopeeRaw.trim()
                       ? shopeeRaw.trim()
